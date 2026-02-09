@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
 using VibeShadowsocks.App.Helpers;
 using VibeShadowsocks.Core.Abstractions;
 using VibeShadowsocks.Core.Models;
@@ -14,6 +15,7 @@ public partial class SettingsViewModel : ObservableObject
     private readonly IHotkeyManager _hotkeyManager;
     private readonly IStartupManager _startupManager;
     private readonly IUpdateService _updateService;
+    private readonly DispatcherQueue? _dispatcherQueue;
     private string _savedLanguage = "English";
 
     [ObservableProperty]
@@ -84,6 +86,7 @@ public partial class SettingsViewModel : ObservableObject
         _hotkeyManager = hotkeyManager;
         _startupManager = startupManager;
         _updateService = updateService;
+        _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         CurrentVersion = Loc.Format("CurrentVersionFmt", _updateService.CurrentVersion ?? "—");
     }
 
@@ -206,7 +209,7 @@ public partial class SettingsViewModel : ObservableObject
         {
             await _updateService.DownloadUpdateAsync(p =>
             {
-                DownloadProgress = p;
+                _dispatcherQueue?.TryEnqueue(() => DownloadProgress = p);
             });
 
             UpdateStatus = Loc.Get("InstallingUpdate");
