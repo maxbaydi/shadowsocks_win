@@ -23,7 +23,20 @@ jobs:
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '8.0.x'
+
+      - name: Pin SDK to 8.x
+        shell: pwsh
+        run: |
+          @'
+          {
+            "sdk": {
+              "version": "8.0.100",
+              "rollForward": "latestFeature"
+            }
+          }
+          '@ | Set-Content -Path global.json
+          dotnet --version
 
       - name: Extract version from tag
         id: version
@@ -42,6 +55,7 @@ jobs:
         run: dotnet test -c Release --no-restore
 
       - name: Publish application
+        shell: pwsh
         run: |
           dotnet publish src\VibeShadowsocks.App\VibeShadowsocks.App.csproj `
             -c Release `
