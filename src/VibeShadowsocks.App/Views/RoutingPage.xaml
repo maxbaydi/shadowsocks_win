@@ -1,0 +1,34 @@
+﻿<Page
+    x:Class="VibeShadowsocks.App.Views.RoutingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <ScrollViewer>
+        <StackPanel Padding="16" Spacing="10">
+            <TextBlock Text="Routing / PAC" Style="{ThemeResource TitleTextBlockStyle}" />
+
+            <ComboBox
+                Header="Routing mode"
+                ItemsSource="{Binding RoutingModes}"
+                SelectedItem="{Binding SelectedRoutingMode, Mode=TwoWay}" />
+
+            <ComboBox Header="PAC profile" ItemsSource="{Binding PacProfiles}" SelectedItem="{Binding SelectedPacProfile, Mode=TwoWay}" DisplayMemberPath="Name" />
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Apply" Command="{Binding ApplyCommand}" />
+                <Button Content="Update PAC" Command="{Binding UpdatePacCommand}" />
+                <Button Content="Refresh Presets" Command="{Binding RefreshPresetsCommand}" />
+            </StackPanel>
+
+            <TextBox Header="PAC preview" Text="{Binding PacPreview}" AcceptsReturn="True" MinHeight="220" TextWrapping="Wrap" IsReadOnly="True" />
+
+            <TextBox Header="Test host/url" Text="{Binding TestInput, Mode=TwoWay}" />
+            <Button Content="Test" Command="{Binding TestCommand}" />
+            <TextBlock Text="{Binding TestOutput}" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding PresetsSummary}" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

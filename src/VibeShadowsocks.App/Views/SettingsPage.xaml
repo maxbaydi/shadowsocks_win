@@ -1,0 +1,30 @@
+﻿<Page
+    x:Class="VibeShadowsocks.App.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <ScrollViewer>
+        <StackPanel Padding="16" Spacing="10">
+            <TextBlock Text="Settings" Style="{ThemeResource TitleTextBlockStyle}" />
+
+            <ToggleSwitch Header="Autostart" IsOn="{Binding AutoStart, Mode=TwoWay}" />
+            <ToggleSwitch Header="Autoconnect" IsOn="{Binding AutoConnect, Mode=TwoWay}" />
+            <ToggleSwitch Header="Close button minimizes to tray" IsOn="{Binding MinimizeToTrayOnClose, Mode=TwoWay}" />
+
+            <TextBox Header="sslocal.exe path" Text="{Binding SsLocalPath, Mode=TwoWay}" />
+            <NumberBox Header="SOCKS port" Value="{Binding SocksPort, Mode=TwoWay}" Minimum="1" Maximum="65535" SpinButtonPlacementMode="Compact" />
+            <NumberBox Header="PAC server port" Value="{Binding PacPort, Mode=TwoWay}" Minimum="1" Maximum="65535" SpinButtonPlacementMode="Compact" />
+            <TextBox Header="Hotkey (example: Ctrl+Alt+Shift+P)" Text="{Binding HotkeyText, Mode=TwoWay}" />
+            <TextBox Header="Log level" Text="{Binding LogLevel, Mode=TwoWay}" />
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Save" Command="{Binding SaveCommand}" />
+                <Button Content="Reload" Command="{Binding LoadCommand}" />
+            </StackPanel>
+
+            <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

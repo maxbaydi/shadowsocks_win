@@ -1,0 +1,54 @@
+﻿<Page
+    x:Class="VibeShadowsocks.App.Views.ServersPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Grid Padding="16" ColumnSpacing="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Spacing="8">
+            <TextBlock Text="Servers" Style="{ThemeResource TitleTextBlockStyle}" />
+            <ListView ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile, Mode=TwoWay}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Text="{Binding Host}" Opacity="0.7" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Add" Command="{Binding AddCommand}" />
+                <Button Content="Delete" Command="{Binding DeleteCommand}" />
+                <Button Content="Save" Command="{Binding SaveCommand}" />
+            </StackPanel>
+        </StackPanel>
+
+        <ScrollViewer Grid.Column="1">
+            <StackPanel Spacing="8">
+                <TextBox Header="Name" Text="{Binding SelectedProfile.Name, Mode=TwoWay}" />
+                <TextBox Header="Host" Text="{Binding SelectedProfile.Host, Mode=TwoWay}" />
+                <NumberBox Header="Port" Value="{Binding SelectedProfile.Port, Mode=TwoWay}" SpinButtonPlacementMode="Compact" Minimum="1" Maximum="65535" />
+                <TextBox Header="Method" Text="{Binding SelectedProfile.Method, Mode=TwoWay}" />
+                <TextBox Header="Password" Text="{Binding SelectedProfile.Password, Mode=TwoWay}" />
+                <TextBox Header="Group" Text="{Binding SelectedProfile.Group, Mode=TwoWay}" />
+                <TextBox Header="Tags (comma separated)" Text="{Binding SelectedProfile.TagsCsv, Mode=TwoWay}" />
+                <ToggleSwitch Header="Favorite" IsOn="{Binding SelectedProfile.IsFavorite, Mode=TwoWay}" />
+
+                <TextBox Header="Import ss://" Text="{Binding ImportText, Mode=TwoWay}" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Content="Import" Command="{Binding ImportCommand}" />
+                    <Button Content="Export selected" Command="{Binding ExportCommand}" />
+                </StackPanel>
+                <TextBox Header="Exported ss://" Text="{Binding ExportText}" IsReadOnly="True" />
+                <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

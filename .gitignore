@@ -1,0 +1,8 @@
+/tools/shadowsocks/*.exe
+/tools/shadowsocks/**/*
+**/bin/
+**/obj/
+.vs/
+TestResults/
+*.user
+*.suo
