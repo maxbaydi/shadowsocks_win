@@ -1,18 +1,172 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="AppName" xml:space="preserve">
-    <value>VibeShadowsocks</value>
-  </data>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="AppName" xml:space="preserve"><value>VibeShadowsocks</value></data>
+
+  <data name="NavDashboard.Content" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="NavServers.Content" xml:space="preserve"><value>Servers</value></data>
+  <data name="NavRouting.Content" xml:space="preserve"><value>Routing / PAC</value></data>
+  <data name="NavSettings.Content" xml:space="preserve"><value>Settings</value></data>
+  <data name="NavLogs.Content" xml:space="preserve"><value>Logs</value></data>
+
+  <data name="DashboardTitle.Text" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="ConnectBtnText.Text" xml:space="preserve"><value>Connect</value></data>
+  <data name="DisconnectBtnText.Text" xml:space="preserve"><value>Disconnect</value></data>
+  <data name="ActiveServerLabel.Text" xml:space="preserve"><value>Active Server</value></data>
+  <data name="RoutingModeLabel.Text" xml:space="preserve"><value>Routing Mode</value></data>
+  <data name="DashboardErrorBar.Title" xml:space="preserve"><value>Error</value></data>
+
+  <data name="SettingsTitle.Text" xml:space="preserve"><value>Settings</value></data>
+  <data name="SaveBtn.Content" xml:space="preserve"><value>Save</value></data>
+  <data name="ReloadBtn.Content" xml:space="preserve"><value>Reload</value></data>
+  <data name="GeneralSection.Text" xml:space="preserve"><value>General</value></data>
+  <data name="AutoStartSwitch.Header" xml:space="preserve"><value>Start with Windows</value></data>
+  <data name="AutoConnectSwitch.Header" xml:space="preserve"><value>Auto-connect on startup</value></data>
+  <data name="MinToTraySwitch.Header" xml:space="preserve"><value>Close button minimizes to tray</value></data>
+  <data name="SslocalSection.Text" xml:space="preserve"><value>sslocal</value></data>
+  <data name="SsLocalPathBox.Header" xml:space="preserve"><value>sslocal.exe path</value></data>
+  <data name="SsLocalPathBox.PlaceholderText" xml:space="preserve"><value>Leave empty for default (tools/sslocal/sslocal.exe)</value></data>
+  <data name="BrowseBtn.Content" xml:space="preserve"><value>Browse...</value></data>
+  <data name="NetworkSection.Text" xml:space="preserve"><value>Network</value></data>
+  <data name="SocksPortBox.Header" xml:space="preserve"><value>SOCKS port</value></data>
+  <data name="PacPortBox.Header" xml:space="preserve"><value>PAC server port</value></data>
+  <data name="HotkeySection.Text" xml:space="preserve"><value>Hotkey</value></data>
+  <data name="HotkeyBox.Header" xml:space="preserve"><value>Global hotkey (toggle connect/disconnect)</value></data>
+  <data name="HotkeyBox.PlaceholderText" xml:space="preserve"><value>e.g. Ctrl+Alt+Shift+P</value></data>
+  <data name="LoggingSection.Text" xml:space="preserve"><value>Logging</value></data>
+  <data name="LogLevelBox.Header" xml:space="preserve"><value>Log level</value></data>
+  <data name="LanguageSection.Text" xml:space="preserve"><value>Language</value></data>
+  <data name="LanguageBox.Header" xml:space="preserve"><value>Interface language</value></data>
+
+  <data name="ServersTitle.Text" xml:space="preserve"><value>Servers</value></data>
+  <data name="AddBtn.Content" xml:space="preserve"><value>Add</value></data>
+  <data name="DeleteBtn.Content" xml:space="preserve"><value>Delete</value></data>
+  <data name="SaveServersBtn.Content" xml:space="preserve"><value>Save</value></data>
+  <data name="SetActiveBtn.Content" xml:space="preserve"><value>Set Active</value></data>
+  <data name="ServerDetailsTitle.Text" xml:space="preserve"><value>Server Details</value></data>
+  <data name="NameBox.Header" xml:space="preserve"><value>Name</value></data>
+  <data name="HostBox.Header" xml:space="preserve"><value>Host</value></data>
+  <data name="PortBox.Header" xml:space="preserve"><value>Port</value></data>
+  <data name="CipherBox.Header" xml:space="preserve"><value>Cipher method</value></data>
+  <data name="PasswordBox.Header" xml:space="preserve"><value>Password</value></data>
+  <data name="GroupBox.Header" xml:space="preserve"><value>Group</value></data>
+  <data name="TagsBox.Header" xml:space="preserve"><value>Tags (comma separated)</value></data>
+  <data name="FavoriteSwitch.Header" xml:space="preserve"><value>Favorite</value></data>
+  <data name="PluginBox.Header" xml:space="preserve"><value>Plugin</value></data>
+  <data name="PluginBox.PlaceholderText" xml:space="preserve"><value>Optional (e.g. v2ray-plugin)</value></data>
+  <data name="PluginOptsBox.Header" xml:space="preserve"><value>Plugin options</value></data>
+  <data name="PluginOptsBox.PlaceholderText" xml:space="preserve"><value>Optional</value></data>
+  <data name="ImportExportTitle.Text" xml:space="preserve"><value>Import / Export</value></data>
+  <data name="ImportUriBox.Header" xml:space="preserve"><value>ss:// URI</value></data>
+  <data name="ImportUriBox.PlaceholderText" xml:space="preserve"><value>Paste ss:// link to import</value></data>
+  <data name="ImportBtn.Content" xml:space="preserve"><value>Import</value></data>
+  <data name="ExportUriBox.Header" xml:space="preserve"><value>Exported URI</value></data>
+  <data name="ExportBtn.Content" xml:space="preserve"><value>Export</value></data>
+
+  <data name="RoutingTitle.Text" xml:space="preserve"><value>Routing Rules</value></data>
+  <data name="SaveApplyBtnText.Text" xml:space="preserve"><value>Save &amp; Apply</value></data>
+  <data name="PacSourceSection.Text" xml:space="preserve"><value>PAC Source</value></data>
+  <data name="RemotePacToggle.Header" xml:space="preserve"><value>Use remote PAC script instead of custom rules</value></data>
+  <data name="RemotePacToggle.OnContent" xml:space="preserve"><value>Remote PAC URL</value></data>
+  <data name="RemotePacToggle.OffContent" xml:space="preserve"><value>Custom Rules</value></data>
+  <data name="RemotePacSection.Text" xml:space="preserve"><value>Remote PAC Script</value></data>
+  <data name="RemotePacDescription.Text" xml:space="preserve"><value>Paste a URL to a .pac file hosted online. The system will set this URL as the AutoConfig proxy. The PAC script decides which traffic goes through the proxy and which goes directly.</value></data>
+  <data name="RemotePacUrlBox.PlaceholderText" xml:space="preserve"><value>https://example.com/proxy.pac</value></data>
+  <data name="RemotePacUrlBox.Header" xml:space="preserve"><value>PAC URL (HTTPS)</value></data>
+  <data name="PortCompatInfo.Title" xml:space="preserve"><value>Port compatibility</value></data>
+  <data name="PortCompatInfo.Message" xml:space="preserve"><value>The remote PAC script must use the same SOCKS port as configured in Settings (default: 1080). If ports don't match, the proxy won't work.</value></data>
+  <data name="HowItWorksInfo.Title" xml:space="preserve"><value>How it works</value></data>
+  <data name="HowItWorksInfo.Message" xml:space="preserve"><value>In PAC mode, traffic is routed based on these rules. Add domains to 'Proxied' to send them through the proxy, or to 'Direct' to bypass it.</value></data>
+  <data name="ProxiedDomainsTitle.Text" xml:space="preserve"><value>Proxied Domains</value></data>
+  <data name="ProxiedDomainsDesc.Text" xml:space="preserve"><value>These domains will route through the Shadowsocks proxy</value></data>
+  <data name="DirectDomainsTitle.Text" xml:space="preserve"><value>Direct Domains (Bypass)</value></data>
+  <data name="DirectDomainsDesc.Text" xml:space="preserve"><value>These domains will always connect directly, bypassing the proxy</value></data>
+  <data name="BehaviorSection.Text" xml:space="preserve"><value>Behavior</value></data>
+  <data name="UnlistedSwitch.Header" xml:space="preserve"><value>Unlisted domains</value></data>
+  <data name="UnlistedSwitch.OnContent" xml:space="preserve"><value>Route through proxy</value></data>
+  <data name="UnlistedSwitch.OffContent" xml:space="preserve"><value>Connect directly</value></data>
+  <data name="BypassPrivateSwitch.Header" xml:space="preserve"><value>Bypass private addresses (10.x, 172.16.x, 192.168.x)</value></data>
+  <data name="BypassSimpleSwitch.Header" xml:space="preserve"><value>Bypass simple hostnames (e.g. intranet)</value></data>
+  <data name="AdvancedExpander.Header" xml:space="preserve"><value>Advanced Settings</value></data>
+  <data name="PacProfileBox.Header" xml:space="preserve"><value>PAC Profile</value></data>
+  <data name="RulesUrlBox.Header" xml:space="preserve"><value>Rules URL (auto-download additional rules)</value></data>
+  <data name="RulesUrlBox.PlaceholderText" xml:space="preserve"><value>https://example.com/rules.txt</value></data>
+  <data name="TestUrlLabel.Text" xml:space="preserve"><value>Test URL</value></data>
+  <data name="TestBtn.Content" xml:space="preserve"><value>Test</value></data>
+  <data name="TestResultBox.PlaceholderText" xml:space="preserve"><value>Result</value></data>
+  <data name="PacPreviewLabel.Text" xml:space="preserve"><value>PAC Script Preview</value></data>
+
+  <data name="LogsTitle.Text" xml:space="preserve"><value>Logs</value></data>
+  <data name="RefreshBtnText.Text" xml:space="preserve"><value>Refresh</value></data>
+  <data name="ExportDiagBtnText.Text" xml:space="preserve"><value>Export Diagnostics</value></data>
+
+  <data name="SettingsLoaded" xml:space="preserve"><value>Settings loaded.</value></data>
+  <data name="SettingsSaved" xml:space="preserve"><value>Settings saved.</value></data>
+  <data name="HotkeyConflictFmt" xml:space="preserve"><value>Hotkey conflict: {0}</value></data>
+  <data name="HotkeyEmpty" xml:space="preserve"><value>Hotkey string is empty.</value></data>
+  <data name="HotkeyInvalid" xml:space="preserve"><value>Hotkey string is invalid.</value></data>
+  <data name="HotkeyMissingKey" xml:space="preserve"><value>Hotkey key part is missing.</value></data>
+  <data name="CopyDiagnostics" xml:space="preserve"><value>Copy Diagnostics</value></data>
+  <data name="Copied" xml:space="preserve"><value>Copied!</value></data>
+  <data name="ReadyToConnect" xml:space="preserve"><value>Ready to connect</value></data>
+  <data name="SelectServerFirst" xml:space="preserve"><value>Select a server first.</value></data>
+  <data name="ActiveServerFmt" xml:space="preserve"><value>Active server: {0}</value></data>
+  <data name="ProfilesSaved" xml:space="preserve"><value>Server profiles saved.</value></data>
+  <data name="ImportedUri" xml:space="preserve"><value>Imported ss:// URI.</value></data>
+  <data name="ImportFailedFmt" xml:space="preserve"><value>Import failed: {0}</value></data>
+  <data name="NoProfileSelected" xml:space="preserve"><value>No profile selected.</value></data>
+  <data name="ExportComplete" xml:space="preserve"><value>Export complete.</value></data>
+  <data name="RemotePacSaved" xml:space="preserve"><value>Remote PAC URL saved and applied.</value></data>
+  <data name="RulesSaved" xml:space="preserve"><value>Rules saved and applied.</value></data>
+  <data name="TestRemoteNA" xml:space="preserve"><value>Testing is not available for remote PAC scripts.</value></data>
+  <data name="NoLogDirectory" xml:space="preserve"><value>No log directory yet.</value></data>
+  <data name="NoLogFiles" xml:space="preserve"><value>No log files found.</value></data>
+  <data name="DiagnosticsExportedFmt" xml:space="preserve"><value>Diagnostics exported: {0}</value></data>
+  <data name="NewServerName" xml:space="preserve"><value>New server</value></data>
+  <data name="RestartForLanguage" xml:space="preserve"><value>Please restart the application to apply the language change.</value></data>
+  <data name="ErrorFmt" xml:space="preserve"><value>Error: {0}</value></data>
+  <data name="RemotePacFmt" xml:space="preserve"><value>Remote: {0}</value></data>
+
+  <data name="TrayConnect" xml:space="preserve"><value>Connect</value></data>
+  <data name="TrayDisconnect" xml:space="preserve"><value>Disconnect</value></data>
+  <data name="TrayRoutingMode" xml:space="preserve"><value>Routing Mode</value></data>
+  <data name="TrayOff" xml:space="preserve"><value>Off</value></data>
+  <data name="TrayGlobal" xml:space="preserve"><value>Global</value></data>
+  <data name="TrayPac" xml:space="preserve"><value>PAC</value></data>
+  <data name="TrayOpen" xml:space="preserve"><value>Open</value></data>
+  <data name="TrayExit" xml:space="preserve"><value>Exit</value></data>
+  <data name="TrayStatusFmt" xml:space="preserve"><value>VibeShadowsocks ({0})</value></data>
+
+  <data name="NotifConnected" xml:space="preserve"><value>Connected</value></data>
+  <data name="NotifDisconnected" xml:space="preserve"><value>Disconnected</value></data>
+  <data name="NotifError" xml:space="preserve"><value>Error</value></data>
+  <data name="NotifTunnelClosed" xml:space="preserve"><value>VPN tunnel closed</value></data>
+  <data name="NotifUnknownServer" xml:space="preserve"><value>Unknown</value></data>
+  <data name="NotifServerFmt" xml:space="preserve"><value>Server: {0}</value></data>
+
+  <data name="UpdateSection.Text" xml:space="preserve"><value>Updates</value></data>
+  <data name="CheckUpdateBtn.Content" xml:space="preserve"><value>Check for updates</value></data>
+  <data name="InstallUpdateBtn.Content" xml:space="preserve"><value>Download &amp; Install</value></data>
+  <data name="CurrentVersionFmt" xml:space="preserve"><value>Current version: {0}</value></data>
+  <data name="CheckingForUpdates" xml:space="preserve"><value>Checking for updates...</value></data>
+  <data name="UpdateAvailableFmt" xml:space="preserve"><value>Update available: v{0}</value></data>
+  <data name="NoUpdates" xml:space="preserve"><value>You are using the latest version.</value></data>
+  <data name="UpdateCheckFailed" xml:space="preserve"><value>Failed to check for updates.</value></data>
+  <data name="Downloading" xml:space="preserve"><value>Downloading update...</value></data>
+  <data name="InstallingUpdate" xml:space="preserve"><value>Installing update and restarting...</value></data>
+  <data name="UpdateDownloadFailed" xml:space="preserve"><value>Failed to download update.</value></data>
+  <data name="NotifUpdateAvailableFmt" xml:space="preserve"><value>Update available: v{0}. Open Settings to install.</value></data>
+
+  <data name="TooltipCopyDiag" xml:space="preserve"><value>Copy diagnostics to clipboard</value></data>
+  <data name="TooltipRefreshStatus" xml:space="preserve"><value>Refresh status</value></data>
+  <data name="TooltipActiveServer" xml:space="preserve"><value>Active server</value></data>
+  <data name="TooltipSetActive" xml:space="preserve"><value>Use selected server for connection</value></data>
+  <data name="TooltipAddDomain" xml:space="preserve"><value>Add domain</value></data>
+  <data name="TooltipRemove" xml:space="preserve"><value>Remove</value></data>
+  <data name="TooltipRefreshLogs" xml:space="preserve"><value>Refresh log view</value></data>
+  <data name="TooltipExportDiag" xml:space="preserve"><value>Export diagnostics bundle to Desktop</value></data>
 </root>

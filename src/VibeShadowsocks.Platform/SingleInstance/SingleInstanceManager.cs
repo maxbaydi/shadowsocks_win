@@ -1,4 +1,4 @@
-﻿using System.IO.Pipes;
+using System.IO.Pipes;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
@@ -43,7 +43,6 @@ public sealed class SingleInstanceManager(ILogger<SingleInstanceManager> logger)
         }
         catch
         {
-            // ignored
         }
 
         _listenerCts?.Dispose();

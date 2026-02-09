@@ -215,6 +215,10 @@
 - Добавлены/обновлены unit tests на ключевую логику (state machine, PAC генерация/парсинг правил, atomic write, обработка ошибок).
 - Никаких секретов в логах/трассировке/исключениях.
 - Обновлена документация (README/Settings UI подсказки) при изменении поведения.
+- **Пересобран дистрибутив** (установщик и portable ZIP) командой:
+  - `powershell -ExecutionPolicy Bypass -File build/Build-Release.ps1 -SsLocalPath "<путь к sslocal.exe>"`
+  - Если `sslocal.exe` уже лежит в `dist/VibeShadowsocks/tools/sslocal/`, можно без `-SsLocalPath`.
+  - Результат: `dist/VibeShadowsocks-Setup.exe` и `dist/VibeShadowsocks-portable-win-x64.zip`.
 
 ---
 

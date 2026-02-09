@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using VibeShadowsocks.Core.Abstractions;
 using VibeShadowsocks.Infrastructure.Diagnostics;
@@ -8,6 +8,7 @@ using VibeShadowsocks.Infrastructure.Pac;
 using VibeShadowsocks.Infrastructure.Processes;
 using VibeShadowsocks.Infrastructure.Proxy;
 using VibeShadowsocks.Infrastructure.Storage;
+using VibeShadowsocks.Infrastructure.Updates;
 
 namespace VibeShadowsocks.Infrastructure.Extensions;
 
@@ -45,6 +46,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPacManager, PacManager>();
 
         services.AddSingleton<IDiagnosticsService, DiagnosticsService>();
+        services.AddSingleton<IUpdateService, UpdateService>();
 
         services.AddSingleton<SimpleFileLoggerProvider>();
         services.AddSingleton<ILoggerProvider>(serviceProvider => serviceProvider.GetRequiredService<SimpleFileLoggerProvider>());

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using VibeShadowsocks.Infrastructure.Options;
 
 namespace VibeShadowsocks.Infrastructure.Diagnostics;
@@ -75,7 +75,6 @@ internal sealed class SimpleFileLogger(string categoryName, AppPaths paths, Sema
         }
         catch
         {
-            // File logging should never crash application flow.
         }
     }
 

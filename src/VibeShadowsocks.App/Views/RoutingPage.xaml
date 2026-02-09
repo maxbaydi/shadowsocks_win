@@ -14,7 +14,7 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Routing Rules" Style="{ThemeResource TitleTextBlockStyle}" VerticalAlignment="Center" />
+                <TextBlock x:Uid="RoutingTitle" Style="{ThemeResource TitleTextBlockStyle}" VerticalAlignment="Center" />
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <ProgressRing IsActive="{Binding IsBusy}" Width="20" Height="20" />
                     <Button
@@ -23,7 +23,7 @@
                         MinWidth="130">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon Glyph="&#xE74E;" FontSize="14" />
-                            <TextBlock Text="Save &amp; Apply" />
+                            <TextBlock x:Uid="SaveApplyBtnText" />
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -36,12 +36,10 @@
                 CornerRadius="8"
                 Padding="20">
                 <StackPanel Spacing="12">
-                    <TextBlock Text="PAC Source" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <TextBlock x:Uid="PacSourceSection" Style="{ThemeResource SubtitleTextBlockStyle}" />
                     <ToggleSwitch
+                        x:Uid="RemotePacToggle"
                         x:Name="RemotePacToggle"
-                        Header="Use remote PAC script instead of custom rules"
-                        OnContent="Remote PAC URL"
-                        OffContent="Custom Rules"
                         IsOn="{Binding IsRemotePac, Mode=TwoWay}" />
                 </StackPanel>
             </Border>
@@ -56,30 +54,27 @@
                 <StackPanel Spacing="12">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE774;" FontSize="16" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
-                        <TextBlock Text="Remote PAC Script" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                        <TextBlock x:Uid="RemotePacSection" Style="{ThemeResource SubtitleTextBlockStyle}" />
                     </StackPanel>
                     <TextBlock
+                        x:Uid="RemotePacDescription"
                         TextWrapping="Wrap"
                         Opacity="0.7"
-                        FontSize="13"
-                        Text="Paste a URL to a .pac file hosted online. The system will set this URL as the AutoConfig proxy. The PAC script decides which traffic goes through the proxy and which goes directly." />
+                        FontSize="13" />
                     <TextBox
-                        Text="{Binding RemotePacUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        PlaceholderText="https://example.com/proxy.pac"
-                        Header="PAC URL (HTTPS)" />
+                        x:Uid="RemotePacUrlBox"
+                        Text="{Binding RemotePacUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <InfoBar
+                        x:Uid="PortCompatInfo"
                         Severity="Warning"
                         IsOpen="True"
-                        IsClosable="False"
-                        Title="Port compatibility"
-                        Message="The remote PAC script must use the same SOCKS port as configured in Settings (default: 1080). If ports don't match, the proxy won't work." />
+                        IsClosable="False" />
                 </StackPanel>
             </Border>
 
             <InfoBar
+                x:Uid="HowItWorksInfo"
                 Visibility="{Binding ManagedVisibility}"
-                Title="How it works"
-                Message="In PAC mode, traffic is routed based on these rules. Add domains to 'Proxied' to send them through the proxy, or to 'Direct' to bypass it."
                 Severity="Informational"
                 IsOpen="True"
                 IsClosable="True" />
@@ -101,10 +96,10 @@
                     <StackPanel Spacing="10">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <FontIcon Glyph="&#xE774;" FontSize="16" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
-                            <TextBlock Text="Proxied Domains" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                            <TextBlock x:Uid="ProxiedDomainsTitle" Style="{ThemeResource BodyStrongTextBlockStyle}" />
                         </StackPanel>
                         <TextBlock
-                            Text="These domains will route through the Shadowsocks proxy"
+                            x:Uid="ProxiedDomainsDesc"
                             Opacity="0.6" FontSize="12" TextWrapping="Wrap" />
 
                         <Grid ColumnSpacing="6">
@@ -120,7 +115,7 @@
                             <Button
                                 Grid.Column="1"
                                 Command="{Binding AddProxyDomainCommand}"
-                                ToolTipService.ToolTip="Add domain">
+                                ToolTipService.ToolTip="{Binding TooltipAddDomain}">
                                 <FontIcon Glyph="&#xE710;" FontSize="14" />
                             </Button>
                         </Grid>
@@ -140,8 +135,7 @@
                                             Tag="{Binding}"
                                             Background="Transparent"
                                             BorderThickness="0"
-                                            Padding="4"
-                                            ToolTipService.ToolTip="Remove">
+                                            Padding="4">
                                             <FontIcon Glyph="&#xE711;" FontSize="11" Opacity="0.6" />
                                         </Button>
                                     </Grid>
@@ -161,10 +155,10 @@
                     <StackPanel Spacing="10">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <FontIcon Glyph="&#xE774;" FontSize="16" Foreground="{ThemeResource SystemFillColorCautionBrush}" />
-                            <TextBlock Text="Direct Domains (Bypass)" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                            <TextBlock x:Uid="DirectDomainsTitle" Style="{ThemeResource BodyStrongTextBlockStyle}" />
                         </StackPanel>
                         <TextBlock
-                            Text="These domains will always connect directly, bypassing the proxy"
+                            x:Uid="DirectDomainsDesc"
                             Opacity="0.6" FontSize="12" TextWrapping="Wrap" />
 
                         <Grid ColumnSpacing="6">
@@ -180,7 +174,7 @@
                             <Button
                                 Grid.Column="1"
                                 Command="{Binding AddDirectDomainCommand}"
-                                ToolTipService.ToolTip="Add domain">
+                                ToolTipService.ToolTip="{Binding TooltipAddDomain}">
                                 <FontIcon Glyph="&#xE710;" FontSize="14" />
                             </Button>
                         </Grid>
@@ -200,8 +194,7 @@
                                             Tag="{Binding}"
                                             Background="Transparent"
                                             BorderThickness="0"
-                                            Padding="4"
-                                            ToolTipService.ToolTip="Remove">
+                                            Padding="4">
                                             <FontIcon Glyph="&#xE711;" FontSize="11" Opacity="0.6" />
                                         </Button>
                                     </Grid>
@@ -220,42 +213,39 @@
                 CornerRadius="8"
                 Padding="20">
                 <StackPanel Spacing="12">
-                    <TextBlock Text="Behavior" Style="{ThemeResource SubtitleTextBlockStyle}" />
                     <ToggleSwitch
-                        Header="Unlisted domains"
-                        OnContent="Route through proxy"
-                        OffContent="Connect directly"
+                        x:Uid="UnlistedSwitch"
                         IsOn="{Binding DefaultActionIsProxy, Mode=TwoWay}" />
                     <ToggleSwitch
-                        Header="Bypass private addresses (10.x, 172.16.x, 192.168.x)"
+                        x:Uid="BypassPrivateSwitch"
                         IsOn="{Binding BypassPrivateAddresses, Mode=TwoWay}" />
                     <ToggleSwitch
-                        Header="Bypass simple hostnames (e.g. intranet)"
+                        x:Uid="BypassSimpleSwitch"
                         IsOn="{Binding BypassSimpleHostnames, Mode=TwoWay}" />
                 </StackPanel>
             </Border>
 
             <Expander
-                Header="Advanced Settings"
+                x:Uid="AdvancedExpander"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Stretch">
                 <StackPanel Spacing="16" Padding="4">
                     <ComboBox
-                        Header="PAC Profile"
+                        x:Uid="PacProfileBox"
                         ItemsSource="{Binding PacProfiles}"
                         SelectedItem="{Binding SelectedPacProfile, Mode=TwoWay}"
                         DisplayMemberPath="Name"
                         HorizontalAlignment="Stretch" />
 
                     <TextBox
+                        x:Uid="RulesUrlBox"
                         Visibility="{Binding ManagedVisibility}"
-                        Header="Rules URL (auto-download additional rules)"
-                        Text="{Binding RulesUrl, Mode=TwoWay}"
-                        PlaceholderText="https://example.com/rules.txt" />
+                        Text="{Binding RulesUrl, Mode=TwoWay}" />
 
                     <TextBlock
+                        x:Uid="TestUrlLabel"
                         Visibility="{Binding ManagedVisibility}"
-                        Text="Test URL" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                        Style="{ThemeResource BodyStrongTextBlockStyle}" />
                     <Grid
                         Visibility="{Binding ManagedVisibility}"
                         ColumnSpacing="8">
@@ -267,11 +257,11 @@
                         <TextBox
                             Text="{Binding TestInput, Mode=TwoWay}"
                             PlaceholderText="https://example.com" />
-                        <Button Grid.Column="1" Command="{Binding TestCommand}" Content="Test" MinWidth="60" />
-                        <TextBox Grid.Column="2" Text="{Binding TestOutput}" IsReadOnly="True" PlaceholderText="Result" />
+                        <Button x:Uid="TestBtn" Grid.Column="1" Command="{Binding TestCommand}" MinWidth="60" />
+                        <TextBox x:Uid="TestResultBox" Grid.Column="2" Text="{Binding TestOutput}" IsReadOnly="True" />
                     </Grid>
 
-                    <TextBlock Text="PAC Script Preview" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                    <TextBlock x:Uid="PacPreviewLabel" Style="{ThemeResource BodyStrongTextBlockStyle}" />
                     <TextBox
                         Text="{Binding PacPreview}"
                         AcceptsReturn="True"

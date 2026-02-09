@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
@@ -123,7 +123,6 @@ public sealed class SsLocalRunner(ILogger<SsLocalRunner> logger) : ISsLocalRunne
                     }
                     catch
                     {
-                        // ignored because sslocal is usually console process.
                     }
 
                     using var gracefulCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -183,7 +182,6 @@ public sealed class SsLocalRunner(ILogger<SsLocalRunner> logger) : ISsLocalRunne
             }
             catch (SocketException)
             {
-                // retry
             }
 
             await Task.Delay(120, cancellationToken).ConfigureAwait(false);

@@ -19,6 +19,7 @@ public sealed class TrayManager : ITrayManager
     private readonly ToolStripMenuItem _openItem = new("Open");
     private readonly ToolStripMenuItem _exitItem = new("Exit");
 
+    private string _statusFormat = "VibeShadowsocks ({0})";
     private bool _initialized;
 
     public event EventHandler? ConnectRequested;
@@ -31,11 +32,16 @@ public sealed class TrayManager : ITrayManager
 
     public event EventHandler<RoutingMode>? RoutingModeChanged;
 
-    public void Initialize(string appName, string? iconPath = null)
+    public void Initialize(string appName, string? iconPath = null, IReadOnlyDictionary<string, string>? labels = null)
     {
         if (_initialized)
         {
             return;
+        }
+
+        if (labels is not null)
+        {
+            ApplyLabels(labels);
         }
 
         _notifyIcon.Text = appName;
@@ -77,7 +83,7 @@ public sealed class TrayManager : ITrayManager
         _routingGlobalItem.Checked = routingMode == RoutingMode.Global;
         _routingPacItem.Checked = routingMode == RoutingMode.Pac;
 
-        _notifyIcon.Text = $"VibeShadowsocks ({state})";
+        _notifyIcon.Text = string.Format(_statusFormat, state);
     }
 
     public void ShowNotification(string title, string message)
@@ -93,6 +99,19 @@ public sealed class TrayManager : ITrayManager
         _notifyIcon.Visible = false;
         _notifyIcon.Dispose();
         _menu.Dispose();
+    }
+
+    private void ApplyLabels(IReadOnlyDictionary<string, string> labels)
+    {
+        if (labels.TryGetValue("Connect", out var connect)) _connectItem.Text = connect;
+        if (labels.TryGetValue("Disconnect", out var disconnect)) _disconnectItem.Text = disconnect;
+        if (labels.TryGetValue("RoutingMode", out var routing)) _routingItem.Text = routing;
+        if (labels.TryGetValue("Off", out var off)) _routingOffItem.Text = off;
+        if (labels.TryGetValue("Global", out var global)) _routingGlobalItem.Text = global;
+        if (labels.TryGetValue("Pac", out var pac)) _routingPacItem.Text = pac;
+        if (labels.TryGetValue("Open", out var open)) _openItem.Text = open;
+        if (labels.TryGetValue("Exit", out var exit)) _exitItem.Text = exit;
+        if (labels.TryGetValue("StatusFormat", out var fmt)) _statusFormat = fmt;
     }
 
     private void OnRoutingMenuClicked(RoutingMode routingMode)
@@ -113,7 +132,6 @@ public sealed class TrayManager : ITrayManager
             }
             catch
             {
-                // fallback
             }
         }
 

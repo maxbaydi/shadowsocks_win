@@ -15,7 +15,7 @@ public interface ITrayManager : IDisposable
 
     event EventHandler<RoutingMode>? RoutingModeChanged;
 
-    void Initialize(string appName, string? iconPath = null);
+    void Initialize(string appName, string? iconPath = null, IReadOnlyDictionary<string, string>? labels = null);
 
     void UpdateState(ConnectionState state, RoutingMode routingMode);
 

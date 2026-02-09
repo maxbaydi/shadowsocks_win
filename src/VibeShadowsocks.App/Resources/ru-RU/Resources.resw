@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="AppName" xml:space="preserve"><value>VibeShadowsocks</value></data>
+
+  <data name="NavDashboard.Content" xml:space="preserve"><value>Панель</value></data>
+  <data name="NavServers.Content" xml:space="preserve"><value>Серверы</value></data>
+  <data name="NavRouting.Content" xml:space="preserve"><value>Маршрутизация</value></data>
+  <data name="NavSettings.Content" xml:space="preserve"><value>Настройки</value></data>
+  <data name="NavLogs.Content" xml:space="preserve"><value>Журнал</value></data>
+
+  <data name="DashboardTitle.Text" xml:space="preserve"><value>Панель управления</value></data>
+  <data name="ConnectBtnText.Text" xml:space="preserve"><value>Подключить</value></data>
+  <data name="DisconnectBtnText.Text" xml:space="preserve"><value>Отключить</value></data>
+  <data name="ActiveServerLabel.Text" xml:space="preserve"><value>Активный сервер</value></data>
+  <data name="RoutingModeLabel.Text" xml:space="preserve"><value>Режим маршрутизации</value></data>
+  <data name="DashboardErrorBar.Title" xml:space="preserve"><value>Ошибка</value></data>
+
+  <data name="SettingsTitle.Text" xml:space="preserve"><value>Настройки</value></data>
+  <data name="SaveBtn.Content" xml:space="preserve"><value>Сохранить</value></data>
+  <data name="ReloadBtn.Content" xml:space="preserve"><value>Обновить</value></data>
+  <data name="GeneralSection.Text" xml:space="preserve"><value>Общие</value></data>
+  <data name="AutoStartSwitch.Header" xml:space="preserve"><value>Запускать с Windows</value></data>
+  <data name="AutoConnectSwitch.Header" xml:space="preserve"><value>Авто-подключение при запуске</value></data>
+  <data name="MinToTraySwitch.Header" xml:space="preserve"><value>Кнопка закрытия сворачивает в трей</value></data>
+  <data name="SslocalSection.Text" xml:space="preserve"><value>sslocal</value></data>
+  <data name="SsLocalPathBox.Header" xml:space="preserve"><value>Путь к sslocal.exe</value></data>
+  <data name="SsLocalPathBox.PlaceholderText" xml:space="preserve"><value>Оставьте пустым для пути по умолчанию (tools/sslocal/sslocal.exe)</value></data>
+  <data name="BrowseBtn.Content" xml:space="preserve"><value>Обзор...</value></data>
+  <data name="NetworkSection.Text" xml:space="preserve"><value>Сеть</value></data>
+  <data name="SocksPortBox.Header" xml:space="preserve"><value>Порт SOCKS</value></data>
+  <data name="PacPortBox.Header" xml:space="preserve"><value>Порт PAC сервера</value></data>
+  <data name="HotkeySection.Text" xml:space="preserve"><value>Горячая клавиша</value></data>
+  <data name="HotkeyBox.Header" xml:space="preserve"><value>Глобальная горячая клавиша (переключение подключения)</value></data>
+  <data name="HotkeyBox.PlaceholderText" xml:space="preserve"><value>напр. Ctrl+Alt+Shift+P</value></data>
+  <data name="LoggingSection.Text" xml:space="preserve"><value>Журналирование</value></data>
+  <data name="LogLevelBox.Header" xml:space="preserve"><value>Уровень логирования</value></data>
+  <data name="LanguageSection.Text" xml:space="preserve"><value>Язык</value></data>
+  <data name="LanguageBox.Header" xml:space="preserve"><value>Язык интерфейса</value></data>
+
+  <data name="ServersTitle.Text" xml:space="preserve"><value>Серверы</value></data>
+  <data name="AddBtn.Content" xml:space="preserve"><value>Добавить</value></data>
+  <data name="DeleteBtn.Content" xml:space="preserve"><value>Удалить</value></data>
+  <data name="SaveServersBtn.Content" xml:space="preserve"><value>Сохранить</value></data>
+  <data name="SetActiveBtn.Content" xml:space="preserve"><value>Сделать активным</value></data>
+  <data name="ServerDetailsTitle.Text" xml:space="preserve"><value>Параметры сервера</value></data>
+  <data name="NameBox.Header" xml:space="preserve"><value>Имя</value></data>
+  <data name="HostBox.Header" xml:space="preserve"><value>Хост</value></data>
+  <data name="PortBox.Header" xml:space="preserve"><value>Порт</value></data>
+  <data name="CipherBox.Header" xml:space="preserve"><value>Метод шифрования</value></data>
+  <data name="PasswordBox.Header" xml:space="preserve"><value>Пароль</value></data>
+  <data name="GroupBox.Header" xml:space="preserve"><value>Группа</value></data>
+  <data name="TagsBox.Header" xml:space="preserve"><value>Теги (через запятую)</value></data>
+  <data name="FavoriteSwitch.Header" xml:space="preserve"><value>Избранное</value></data>
+  <data name="PluginBox.Header" xml:space="preserve"><value>Плагин</value></data>
+  <data name="PluginBox.PlaceholderText" xml:space="preserve"><value>Опционально (напр. v2ray-plugin)</value></data>
+  <data name="PluginOptsBox.Header" xml:space="preserve"><value>Опции плагина</value></data>
+  <data name="PluginOptsBox.PlaceholderText" xml:space="preserve"><value>Опционально</value></data>
+  <data name="ImportExportTitle.Text" xml:space="preserve"><value>Импорт / Экспорт</value></data>
+  <data name="ImportUriBox.Header" xml:space="preserve"><value>ss:// URI</value></data>
+  <data name="ImportUriBox.PlaceholderText" xml:space="preserve"><value>Вставьте ss:// ссылку для импорта</value></data>
+  <data name="ImportBtn.Content" xml:space="preserve"><value>Импорт</value></data>
+  <data name="ExportUriBox.Header" xml:space="preserve"><value>Экспортированный URI</value></data>
+  <data name="ExportBtn.Content" xml:space="preserve"><value>Экспорт</value></data>
+
+  <data name="RoutingTitle.Text" xml:space="preserve"><value>Правила маршрутизации</value></data>
+  <data name="SaveApplyBtnText.Text" xml:space="preserve"><value>Сохранить и применить</value></data>
+  <data name="PacSourceSection.Text" xml:space="preserve"><value>Источник PAC</value></data>
+  <data name="RemotePacToggle.Header" xml:space="preserve"><value>Использовать удалённый PAC вместо своих правил</value></data>
+  <data name="RemotePacToggle.OnContent" xml:space="preserve"><value>Удалённый PAC URL</value></data>
+  <data name="RemotePacToggle.OffContent" xml:space="preserve"><value>Свои правила</value></data>
+  <data name="RemotePacSection.Text" xml:space="preserve"><value>Удалённый PAC скрипт</value></data>
+  <data name="RemotePacDescription.Text" xml:space="preserve"><value>Вставьте URL .pac файла, размещённого в интернете. Система установит этот URL в качестве AutoConfig прокси. PAC скрипт определяет, какой трафик идёт через прокси, а какой — напрямую.</value></data>
+  <data name="RemotePacUrlBox.PlaceholderText" xml:space="preserve"><value>https://example.com/proxy.pac</value></data>
+  <data name="RemotePacUrlBox.Header" xml:space="preserve"><value>PAC URL (HTTPS)</value></data>
+  <data name="PortCompatInfo.Title" xml:space="preserve"><value>Совместимость портов</value></data>
+  <data name="PortCompatInfo.Message" xml:space="preserve"><value>Удалённый PAC скрипт должен использовать тот же SOCKS порт, что указан в Настройках (по умолчанию: 1080). Если порты не совпадают, прокси работать не будет.</value></data>
+  <data name="HowItWorksInfo.Title" xml:space="preserve"><value>Как это работает</value></data>
+  <data name="HowItWorksInfo.Message" xml:space="preserve"><value>В режиме PAC трафик маршрутизируется по этим правилам. Добавьте домены в «Через прокси» для направления через прокси, или в «Напрямую» для обхода.</value></data>
+  <data name="ProxiedDomainsTitle.Text" xml:space="preserve"><value>Проксируемые домены</value></data>
+  <data name="ProxiedDomainsDesc.Text" xml:space="preserve"><value>Эти домены будут направляться через Shadowsocks прокси</value></data>
+  <data name="DirectDomainsTitle.Text" xml:space="preserve"><value>Прямые домены (обход)</value></data>
+  <data name="DirectDomainsDesc.Text" xml:space="preserve"><value>Эти домены всегда подключаются напрямую, минуя прокси</value></data>
+  <data name="BehaviorSection.Text" xml:space="preserve"><value>Поведение</value></data>
+  <data name="UnlistedSwitch.Header" xml:space="preserve"><value>Домены не из списков</value></data>
+  <data name="UnlistedSwitch.OnContent" xml:space="preserve"><value>Через прокси</value></data>
+  <data name="UnlistedSwitch.OffContent" xml:space="preserve"><value>Напрямую</value></data>
+  <data name="BypassPrivateSwitch.Header" xml:space="preserve"><value>Обходить частные адреса (10.x, 172.16.x, 192.168.x)</value></data>
+  <data name="BypassSimpleSwitch.Header" xml:space="preserve"><value>Обходить простые имена хостов (напр. intranet)</value></data>
+  <data name="AdvancedExpander.Header" xml:space="preserve"><value>Дополнительные настройки</value></data>
+  <data name="PacProfileBox.Header" xml:space="preserve"><value>PAC профиль</value></data>
+  <data name="RulesUrlBox.Header" xml:space="preserve"><value>URL правил (авто-загрузка доп. правил)</value></data>
+  <data name="RulesUrlBox.PlaceholderText" xml:space="preserve"><value>https://example.com/rules.txt</value></data>
+  <data name="TestUrlLabel.Text" xml:space="preserve"><value>Тест URL</value></data>
+  <data name="TestBtn.Content" xml:space="preserve"><value>Тест</value></data>
+  <data name="TestResultBox.PlaceholderText" xml:space="preserve"><value>Результат</value></data>
+  <data name="PacPreviewLabel.Text" xml:space="preserve"><value>Предпросмотр PAC скрипта</value></data>
+
+  <data name="LogsTitle.Text" xml:space="preserve"><value>Журнал</value></data>
+  <data name="RefreshBtnText.Text" xml:space="preserve"><value>Обновить</value></data>
+  <data name="ExportDiagBtnText.Text" xml:space="preserve"><value>Экспорт диагностики</value></data>
+
+  <data name="SettingsLoaded" xml:space="preserve"><value>Настройки загружены.</value></data>
+  <data name="SettingsSaved" xml:space="preserve"><value>Настройки сохранены.</value></data>
+  <data name="HotkeyConflictFmt" xml:space="preserve"><value>Конфликт горячей клавиши: {0}</value></data>
+  <data name="HotkeyEmpty" xml:space="preserve"><value>Строка горячей клавиши пуста.</value></data>
+  <data name="HotkeyInvalid" xml:space="preserve"><value>Строка горячей клавиши недействительна.</value></data>
+  <data name="HotkeyMissingKey" xml:space="preserve"><value>Отсутствует основная клавиша.</value></data>
+  <data name="CopyDiagnostics" xml:space="preserve"><value>Копировать диагностику</value></data>
+  <data name="Copied" xml:space="preserve"><value>Скопировано!</value></data>
+  <data name="ReadyToConnect" xml:space="preserve"><value>Готов к подключению</value></data>
+  <data name="SelectServerFirst" xml:space="preserve"><value>Сначала выберите сервер.</value></data>
+  <data name="ActiveServerFmt" xml:space="preserve"><value>Активный сервер: {0}</value></data>
+  <data name="ProfilesSaved" xml:space="preserve"><value>Профили серверов сохранены.</value></data>
+  <data name="ImportedUri" xml:space="preserve"><value>Импортирован ss:// URI.</value></data>
+  <data name="ImportFailedFmt" xml:space="preserve"><value>Ошибка импорта: {0}</value></data>
+  <data name="NoProfileSelected" xml:space="preserve"><value>Профиль не выбран.</value></data>
+  <data name="ExportComplete" xml:space="preserve"><value>Экспорт завершён.</value></data>
+  <data name="RemotePacSaved" xml:space="preserve"><value>Удалённый PAC URL сохранён и применён.</value></data>
+  <data name="RulesSaved" xml:space="preserve"><value>Правила сохранены и применены.</value></data>
+  <data name="TestRemoteNA" xml:space="preserve"><value>Тестирование недоступно для удалённых PAC скриптов.</value></data>
+  <data name="NoLogDirectory" xml:space="preserve"><value>Директория логов ещё не создана.</value></data>
+  <data name="NoLogFiles" xml:space="preserve"><value>Файлы логов не найдены.</value></data>
+  <data name="DiagnosticsExportedFmt" xml:space="preserve"><value>Диагностика экспортирована: {0}</value></data>
+  <data name="NewServerName" xml:space="preserve"><value>Новый сервер</value></data>
+  <data name="RestartForLanguage" xml:space="preserve"><value>Для смены языка необходимо перезапустить приложение.</value></data>
+  <data name="ErrorFmt" xml:space="preserve"><value>Ошибка: {0}</value></data>
+  <data name="RemotePacFmt" xml:space="preserve"><value>Удалённый: {0}</value></data>
+
+  <data name="TrayConnect" xml:space="preserve"><value>Подключить</value></data>
+  <data name="TrayDisconnect" xml:space="preserve"><value>Отключить</value></data>
+  <data name="TrayRoutingMode" xml:space="preserve"><value>Режим маршрутизации</value></data>
+  <data name="TrayOff" xml:space="preserve"><value>Выкл</value></data>
+  <data name="TrayGlobal" xml:space="preserve"><value>Глобальный</value></data>
+  <data name="TrayPac" xml:space="preserve"><value>PAC</value></data>
+  <data name="TrayOpen" xml:space="preserve"><value>Открыть</value></data>
+  <data name="TrayExit" xml:space="preserve"><value>Выход</value></data>
+  <data name="TrayStatusFmt" xml:space="preserve"><value>VibeShadowsocks ({0})</value></data>
+
+  <data name="NotifConnected" xml:space="preserve"><value>Подключено</value></data>
+  <data name="NotifDisconnected" xml:space="preserve"><value>Отключено</value></data>
+  <data name="NotifError" xml:space="preserve"><value>Ошибка</value></data>
+  <data name="NotifTunnelClosed" xml:space="preserve"><value>VPN-туннель закрыт</value></data>
+  <data name="NotifUnknownServer" xml:space="preserve"><value>Неизвестно</value></data>
+  <data name="NotifServerFmt" xml:space="preserve"><value>Сервер: {0}</value></data>
+
+  <data name="UpdateSection.Text" xml:space="preserve"><value>Обновления</value></data>
+  <data name="CheckUpdateBtn.Content" xml:space="preserve"><value>Проверить обновления</value></data>
+  <data name="InstallUpdateBtn.Content" xml:space="preserve"><value>Скачать и установить</value></data>
+  <data name="CurrentVersionFmt" xml:space="preserve"><value>Текущая версия: {0}</value></data>
+  <data name="CheckingForUpdates" xml:space="preserve"><value>Проверка обновлений...</value></data>
+  <data name="UpdateAvailableFmt" xml:space="preserve"><value>Доступно обновление: v{0}</value></data>
+  <data name="NoUpdates" xml:space="preserve"><value>Вы используете последнюю версию.</value></data>
+  <data name="UpdateCheckFailed" xml:space="preserve"><value>Не удалось проверить обновления.</value></data>
+  <data name="Downloading" xml:space="preserve"><value>Загрузка обновления...</value></data>
+  <data name="InstallingUpdate" xml:space="preserve"><value>Установка обновления и перезапуск...</value></data>
+  <data name="UpdateDownloadFailed" xml:space="preserve"><value>Не удалось загрузить обновление.</value></data>
+  <data name="NotifUpdateAvailableFmt" xml:space="preserve"><value>Доступно обновление: v{0}. Откройте Настройки для установки.</value></data>
+
+  <data name="TooltipCopyDiag" xml:space="preserve"><value>Скопировать диагностику в буфер обмена</value></data>
+  <data name="TooltipRefreshStatus" xml:space="preserve"><value>Обновить статус</value></data>
+  <data name="TooltipActiveServer" xml:space="preserve"><value>Активный сервер</value></data>
+  <data name="TooltipSetActive" xml:space="preserve"><value>Использовать выбранный сервер для подключения</value></data>
+  <data name="TooltipAddDomain" xml:space="preserve"><value>Добавить домен</value></data>
+  <data name="TooltipRemove" xml:space="preserve"><value>Удалить</value></data>
+  <data name="TooltipRefreshLogs" xml:space="preserve"><value>Обновить журнал</value></data>
+  <data name="TooltipExportDiag" xml:space="preserve"><value>Экспортировать диагностику на Рабочий стол</value></data>
+</root>

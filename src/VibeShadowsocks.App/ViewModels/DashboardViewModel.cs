@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
+using VibeShadowsocks.App.Helpers;
 using VibeShadowsocks.App.Services;
 using VibeShadowsocks.Core.Abstractions;
 using VibeShadowsocks.Core.Models;
@@ -26,7 +27,7 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
     private string _stateText = "Disconnected";
 
     [ObservableProperty]
-    private string _stateMessage = "Ready to connect";
+    private string _stateMessage = string.Empty;
 
     [ObservableProperty]
     private ObservableCollection<ServerProfile> _serverProfiles = [];
@@ -53,7 +54,10 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
     private bool _isErrorVisible;
 
     [ObservableProperty]
-    private string _copyButtonText = "Copy Diagnostics";
+    private string _copyButtonText = string.Empty;
+
+    public string TooltipCopyDiag => Loc.Get("TooltipCopyDiag");
+    public string TooltipRefreshStatus => Loc.Get("TooltipRefreshStatus");
 
     public IReadOnlyList<string> RoutingModes { get; } = ["Off", "Global", "Pac"];
 
@@ -68,6 +72,8 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
         _diagnosticsService = diagnosticsService;
         _clipboardService = clipboardService;
         _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+        _stateMessage = Loc.Get("ReadyToConnect");
+        _copyButtonText = Loc.Get("CopyDiagnostics");
 
         _orchestrator.StateChanged += OnStateChanged;
     }
@@ -186,9 +192,9 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
     {
         var diagnostics = await _diagnosticsService.BuildTextReportAsync();
         _clipboardService.SetText(diagnostics);
-        CopyButtonText = "Copied!";
+        CopyButtonText = Loc.Get("Copied");
         await Task.Delay(1500);
-        CopyButtonText = "Copy Diagnostics";
+        CopyButtonText = Loc.Get("CopyDiagnostics");
     }
 
     [RelayCommand]

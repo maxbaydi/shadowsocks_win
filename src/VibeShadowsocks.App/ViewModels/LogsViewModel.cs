@@ -1,5 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using VibeShadowsocks.App.Helpers;
 using VibeShadowsocks.Core.Abstractions;
 using VibeShadowsocks.Infrastructure.Options;
 
@@ -15,6 +16,9 @@ public partial class LogsViewModel : ObservableObject
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
+
+    public string TooltipRefreshLogs => Loc.Get("TooltipRefreshLogs");
+    public string TooltipExportDiag => Loc.Get("TooltipExportDiag");
 
     public LogsViewModel(IDiagnosticsService diagnosticsService, AppPaths paths)
     {
@@ -32,7 +36,7 @@ public partial class LogsViewModel : ObservableObject
     {
         if (!Directory.Exists(_paths.LogsDirectory))
         {
-            LogText = "No log directory yet.";
+            LogText = Loc.Get("NoLogDirectory");
             StatusMessage = string.Empty;
             return;
         }
@@ -44,7 +48,7 @@ public partial class LogsViewModel : ObservableObject
 
         if (latestLogFile is null)
         {
-            LogText = "No log files found.";
+            LogText = Loc.Get("NoLogFiles");
             StatusMessage = string.Empty;
             return;
         }
@@ -58,6 +62,6 @@ public partial class LogsViewModel : ObservableObject
     {
         var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
         var outputPath = await _diagnosticsService.ExportBundleAsync(desktop);
-        StatusMessage = $"Diagnostics exported: {outputPath}";
+        StatusMessage = Loc.Format("DiagnosticsExportedFmt", outputPath);
     }
 }

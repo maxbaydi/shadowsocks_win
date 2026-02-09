@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using VibeShadowsocks.App.Helpers;
 using VibeShadowsocks.Core.Abstractions;
 using VibeShadowsocks.Core.Models;
 using VibeShadowsocks.Platform.Hotkeys;
@@ -12,6 +13,8 @@ public partial class SettingsViewModel : ObservableObject
     private readonly ISettingsStore _settingsStore;
     private readonly IHotkeyManager _hotkeyManager;
     private readonly IStartupManager _startupManager;
+    private readonly IUpdateService _updateService;
+    private string _savedLanguage = "English";
 
     [ObservableProperty]
     private bool _autoStart;
@@ -43,13 +46,57 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _isBusy;
 
+    [ObservableProperty]
+    private string _selectedLanguage = "English";
+
+    [ObservableProperty]
+    private string _languageStatusMessage = string.Empty;
+
+    [ObservableProperty]
+    private string _currentVersion = string.Empty;
+
+    [ObservableProperty]
+    private string _updateStatus = string.Empty;
+
+    [ObservableProperty]
+    private bool _isUpdateAvailable;
+
+    [ObservableProperty]
+    private bool _isCheckingUpdate;
+
+    [ObservableProperty]
+    private bool _isDownloadingUpdate;
+
+    [ObservableProperty]
+    private int _downloadProgress;
+
     public IReadOnlyList<string> LogLevels { get; } = ["Trace", "Debug", "Information", "Warning", "Error", "Critical"];
 
-    public SettingsViewModel(ISettingsStore settingsStore, IHotkeyManager hotkeyManager, IStartupManager startupManager)
+    public IReadOnlyList<string> Languages { get; } = ["English", "Русский"];
+
+    public SettingsViewModel(
+        ISettingsStore settingsStore,
+        IHotkeyManager hotkeyManager,
+        IStartupManager startupManager,
+        IUpdateService updateService)
     {
         _settingsStore = settingsStore;
         _hotkeyManager = hotkeyManager;
         _startupManager = startupManager;
+        _updateService = updateService;
+        CurrentVersion = Loc.Format("CurrentVersionFmt", _updateService.CurrentVersion ?? "—");
+    }
+
+    partial void OnSelectedLanguageChanged(string value)
+    {
+        if (value != _savedLanguage)
+        {
+            LanguageStatusMessage = Loc.Get("RestartForLanguage");
+        }
+        else
+        {
+            LanguageStatusMessage = string.Empty;
+        }
     }
 
     [RelayCommand]
@@ -65,7 +112,10 @@ public partial class SettingsViewModel : ObservableObject
         PacPort = settings.Ports.PacServerPort;
         HotkeyText = settings.Hotkey.Display;
         LogLevel = settings.LogLevel;
-        StatusMessage = "Settings loaded.";
+        SelectedLanguage = LanguageCodeToDisplay(settings.Language);
+        _savedLanguage = SelectedLanguage;
+        LanguageStatusMessage = string.Empty;
+        StatusMessage = Loc.Get("SettingsLoaded");
     }
 
     [RelayCommand]
@@ -79,7 +129,7 @@ public partial class SettingsViewModel : ObservableObject
 
         if (!_hotkeyManager.Register(hotkey, out var registrationError))
         {
-            StatusMessage = $"Hotkey conflict: {registrationError}";
+            StatusMessage = Loc.Format("HotkeyConflictFmt", registrationError);
             return;
         }
 
@@ -87,6 +137,8 @@ public partial class SettingsViewModel : ObservableObject
         try
         {
             await _startupManager.SetEnabledAsync(AutoStart);
+
+            var languageCode = DisplayToLanguageCode(SelectedLanguage);
 
             await _settingsStore.UpdateAsync(settings => settings with
             {
@@ -101,13 +153,72 @@ public partial class SettingsViewModel : ObservableObject
                 },
                 Hotkey = hotkey,
                 LogLevel = LogLevel,
+                Language = languageCode,
             });
 
-            StatusMessage = "Settings saved.";
+            _savedLanguage = SelectedLanguage;
+            StatusMessage = Loc.Get("SettingsSaved");
         }
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task CheckUpdateAsync()
+    {
+        IsCheckingUpdate = true;
+        UpdateStatus = Loc.Get("CheckingForUpdates");
+        IsUpdateAvailable = false;
+
+        try
+        {
+            var info = await _updateService.CheckForUpdateAsync();
+            if (info is not null)
+            {
+                IsUpdateAvailable = true;
+                UpdateStatus = Loc.Format("UpdateAvailableFmt", info.TargetVersion);
+            }
+            else
+            {
+                UpdateStatus = Loc.Get("NoUpdates");
+            }
+        }
+        catch
+        {
+            UpdateStatus = Loc.Get("UpdateCheckFailed");
+        }
+        finally
+        {
+            IsCheckingUpdate = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task DownloadAndApplyUpdateAsync()
+    {
+        IsDownloadingUpdate = true;
+        DownloadProgress = 0;
+        UpdateStatus = Loc.Get("Downloading");
+
+        try
+        {
+            await _updateService.DownloadUpdateAsync(p =>
+            {
+                DownloadProgress = p;
+            });
+
+            UpdateStatus = Loc.Get("InstallingUpdate");
+            _updateService.ApplyUpdateAndRestart();
+        }
+        catch
+        {
+            UpdateStatus = Loc.Get("UpdateDownloadFailed");
+        }
+        finally
+        {
+            IsDownloadingUpdate = false;
         }
     }
 
@@ -118,14 +229,14 @@ public partial class SettingsViewModel : ObservableObject
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            error = "Hotkey string is empty.";
+            error = Loc.Get("HotkeyEmpty");
             return false;
         }
 
         var parts = value.Split('+', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (parts.Length == 0)
         {
-            error = "Hotkey string is invalid.";
+            error = Loc.Get("HotkeyInvalid");
             return false;
         }
 
@@ -140,7 +251,7 @@ public partial class SettingsViewModel : ObservableObject
             key.Equals("Shift", StringComparison.OrdinalIgnoreCase) ||
             key.Equals("Win", StringComparison.OrdinalIgnoreCase))
         {
-            error = "Hotkey key part is missing.";
+            error = Loc.Get("HotkeyMissingKey");
             return false;
         }
 
@@ -155,4 +266,16 @@ public partial class SettingsViewModel : ObservableObject
 
         return true;
     }
+
+    private static string LanguageCodeToDisplay(string code) => code switch
+    {
+        "ru-RU" => "Русский",
+        _ => "English",
+    };
+
+    private static string DisplayToLanguageCode(string display) => display switch
+    {
+        "Русский" => "ru-RU",
+        _ => "en-US",
+    };
 }

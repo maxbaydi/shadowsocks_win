@@ -1,8 +1,10 @@
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+using VibeShadowsocks.App.Helpers;
 using VibeShadowsocks.App.Services;
 using VibeShadowsocks.App.ViewModels;
 using VibeShadowsocks.Core.Abstractions;
@@ -32,6 +34,7 @@ public partial class App : Application
 
     public App()
     {
+        ApplyLanguageOverride();
         InitializeComponent();
         Host = BuildHost();
 
@@ -58,7 +61,7 @@ public partial class App : Application
 
             if (!isPrimaryInstance)
             {
-                _logger.LogInformation("Secondary instance detected. Exiting after activation signal.");
+                _logger.LogInformation("Secondary instance detected, exiting.");
                 await Host.StopAsync();
                 Exit();
                 return;
@@ -84,37 +87,49 @@ public partial class App : Application
             var settings = await _settingsStore.LoadAsync();
 
             var iconPath = Path.Combine(AppContext.BaseDirectory, "app.ico");
-            _trayManager.Initialize("VibeShadowsocks", iconPath);
+            var trayLabels = BuildTrayLabels();
+            _trayManager.Initialize("VibeShadowsocks", iconPath, trayLabels);
             _trayManager.UpdateState(_orchestrator.Snapshot.State, settings.RoutingMode);
 
             if (!_hotkeyManager.Register(settings.Hotkey, out var hotkeyError))
             {
-                _trayManager.ShowNotification("VibeShadowsocks", $"Hotkey conflict: {hotkeyError}");
+                _trayManager.ShowNotification("VibeShadowsocks", Loc.Format("HotkeyConflictFmt", hotkeyError));
             }
 
-            _logger.LogInformation("Creating MainWindow...");
             _window = GetService<MainWindow>();
-            _logger.LogInformation("MainWindow created. Activating...");
             _window.Activate();
 
             if (settings.AutoConnect)
             {
                 _ = _orchestrator.ConnectAsync();
             }
+
+            _ = CheckForUpdateInBackgroundAsync();
         }
         catch (Exception exception)
         {
-            try
-            {
-                _logger?.LogError(exception, "Fatal startup failure in OnLaunched.");
-                Console.Error.WriteLine(exception);
-            }
-            catch
-            {
-                // ignored
-            }
-
+            _logger?.LogError(exception, "Fatal startup failure in OnLaunched.");
             await ShutdownAsync();
+        }
+    }
+
+    private async Task CheckForUpdateInBackgroundAsync()
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(5));
+            var updateService = GetService<IUpdateService>();
+            var info = await updateService.CheckForUpdateAsync();
+            if (info is not null)
+            {
+                _trayManager?.ShowNotification(
+                    "VibeShadowsocks",
+                    Loc.Format("NotifUpdateAvailableFmt", info.TargetVersion));
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Background update check failed");
         }
     }
 
@@ -125,8 +140,6 @@ public partial class App : Application
             .ConfigureLogging(logging =>
             {
                 logging.ClearProviders();
-                logging.AddDebug();
-                logging.AddConsole();
                 logging.SetMinimumLevel(LogLevel.Information);
             })
             .ConfigureServices(services =>
@@ -164,9 +177,15 @@ public partial class App : Application
 
             var (title, message) = eventArgs.Snapshot.State switch
             {
-                ConnectionState.Connected => ("Connected", $"Server: {settings.GetActiveServerProfile()?.Name ?? "Unknown"}"),
-                ConnectionState.Disconnected => ("Disconnected", "VPN tunnel closed"),
-                ConnectionState.Faulted => ("Error", eventArgs.Snapshot.Message),
+                ConnectionState.Connected => (
+                    Loc.Get("NotifConnected"),
+                    Loc.Format("NotifServerFmt", settings.GetActiveServerProfile()?.Name ?? Loc.Get("NotifUnknownServer"))),
+                ConnectionState.Disconnected => (
+                    Loc.Get("NotifDisconnected"),
+                    Loc.Get("NotifTunnelClosed")),
+                ConnectionState.Faulted => (
+                    Loc.Get("NotifError"),
+                    eventArgs.Snapshot.Message),
                 _ => (null as string, null as string),
             };
 
@@ -207,16 +226,7 @@ public partial class App : Application
 
     private async void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs eventArgs)
     {
-        try
-        {
-            _logger?.LogError(eventArgs.Exception, "Unhandled UI exception.");
-            Console.Error.WriteLine(eventArgs.Exception);
-        }
-        catch
-        {
-            // ignored
-        }
-
+        _logger?.LogError(eventArgs.Exception, "Unhandled UI exception.");
         eventArgs.Handled = true;
 
         if (_orchestrator is not null)
@@ -240,7 +250,6 @@ public partial class App : Application
         }
         catch
         {
-            // Ignore on shutdown.
         }
     }
 
@@ -262,7 +271,6 @@ public partial class App : Application
         }
         catch
         {
-            // continue shutdown.
         }
 
         _hotkeyManager?.Dispose();
@@ -275,4 +283,46 @@ public partial class App : Application
         await Host.StopAsync();
         Exit();
     }
+
+    private static void ApplyLanguageOverride()
+    {
+        var settingsPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "VibeShadowsocks", "settings.json");
+
+        if (!File.Exists(settingsPath))
+        {
+            return;
+        }
+
+        try
+        {
+            var json = File.ReadAllText(settingsPath);
+            using var doc = JsonDocument.Parse(json);
+            if (doc.RootElement.TryGetProperty("language", out var lang))
+            {
+                var code = lang.GetString();
+                if (!string.IsNullOrEmpty(code) && code != "en-US")
+                {
+                    Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = code;
+                }
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private static Dictionary<string, string> BuildTrayLabels() => new()
+    {
+        ["Connect"] = Loc.Get("TrayConnect"),
+        ["Disconnect"] = Loc.Get("TrayDisconnect"),
+        ["RoutingMode"] = Loc.Get("TrayRoutingMode"),
+        ["Off"] = Loc.Get("TrayOff"),
+        ["Global"] = Loc.Get("TrayGlobal"),
+        ["Pac"] = Loc.Get("TrayPac"),
+        ["Open"] = Loc.Get("TrayOpen"),
+        ["Exit"] = Loc.Get("TrayExit"),
+        ["StatusFormat"] = Loc.Get("TrayStatusFmt"),
+    };
 }

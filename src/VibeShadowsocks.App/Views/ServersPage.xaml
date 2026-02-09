@@ -18,7 +18,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock Text="Servers" Style="{ThemeResource TitleTextBlockStyle}" />
+            <TextBlock x:Uid="ServersTitle" Style="{ThemeResource TitleTextBlockStyle}" />
 
             <ListView
                 Grid.Row="1"
@@ -51,8 +51,7 @@
                                 FontSize="14"
                                 Foreground="{ThemeResource SystemFillColorSuccessBrush}"
                                 Visibility="{Binding IsActive}"
-                                VerticalAlignment="Center"
-                                ToolTipService.ToolTip="Active server" />
+                                VerticalAlignment="Center" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -65,15 +64,15 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Button Content="Add" Command="{Binding AddCommand}" HorizontalAlignment="Stretch" />
-                    <Button Grid.Column="1" Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Stretch" />
-                    <Button Grid.Column="2" Content="Save" Command="{Binding SaveCommand}" Style="{ThemeResource AccentButtonStyle}" HorizontalAlignment="Stretch" />
+                    <Button x:Uid="AddBtn" Command="{Binding AddCommand}" HorizontalAlignment="Stretch" />
+                    <Button x:Uid="DeleteBtn" Grid.Column="1" Command="{Binding DeleteCommand}" HorizontalAlignment="Stretch" />
+                    <Button x:Uid="SaveServersBtn" Grid.Column="2" Command="{Binding SaveCommand}" Style="{ThemeResource AccentButtonStyle}" HorizontalAlignment="Stretch" />
                 </Grid>
                 <Button
-                    Content="Set Active"
+                    x:Uid="SetActiveBtn"
                     Command="{Binding SetActiveCommand}"
                     HorizontalAlignment="Stretch"
-                    ToolTipService.ToolTip="Use selected server for connection">
+                    ToolTipService.ToolTip="{Binding TooltipSetActive}">
                     <Button.KeyboardAccelerators>
                         <KeyboardAccelerator Modifiers="Control" Key="Enter" />
                     </Button.KeyboardAccelerators>
@@ -90,17 +89,17 @@
             CornerRadius="8">
             <ScrollViewer Padding="20">
                 <StackPanel Spacing="12">
-                    <TextBlock Text="Server Details" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <TextBlock x:Uid="ServerDetailsTitle" Style="{ThemeResource SubtitleTextBlockStyle}" />
 
-                    <TextBox Header="Name" Text="{Binding SelectedProfile.Name, Mode=TwoWay}" />
+                    <TextBox x:Uid="NameBox" Text="{Binding SelectedProfile.Name, Mode=TwoWay}" />
 
                     <Grid ColumnSpacing="12">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="120" />
                         </Grid.ColumnDefinitions>
-                        <TextBox Header="Host" Text="{Binding SelectedProfile.Host, Mode=TwoWay}" />
-                        <NumberBox Grid.Column="1" Header="Port" Value="{Binding SelectedProfile.Port, Mode=TwoWay}"
+                        <TextBox x:Uid="HostBox" Text="{Binding SelectedProfile.Host, Mode=TwoWay}" />
+                        <NumberBox x:Uid="PortBox" Grid.Column="1" Value="{Binding SelectedProfile.Port, Mode=TwoWay}"
                                    SpinButtonPlacementMode="Compact" Minimum="1" Maximum="65535" />
                     </Grid>
 
@@ -109,8 +108,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBox Header="Cipher method" Text="{Binding SelectedProfile.Method, Mode=TwoWay}" />
-                        <PasswordBox Grid.Column="1" Header="Password" Password="{Binding SelectedProfile.Password, Mode=TwoWay}" />
+                        <TextBox x:Uid="CipherBox" Text="{Binding SelectedProfile.Method, Mode=TwoWay}" />
+                        <PasswordBox x:Uid="PasswordBox" Grid.Column="1" Password="{Binding SelectedProfile.Password, Mode=TwoWay}" />
                     </Grid>
 
                     <Grid ColumnSpacing="12">
@@ -118,16 +117,14 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBox Header="Group" Text="{Binding SelectedProfile.Group, Mode=TwoWay}" />
-                        <TextBox Grid.Column="1" Header="Tags (comma separated)" Text="{Binding SelectedProfile.TagsCsv, Mode=TwoWay}" />
+                        <TextBox x:Uid="GroupBox" Text="{Binding SelectedProfile.Group, Mode=TwoWay}" />
+                        <TextBox x:Uid="TagsBox" Grid.Column="1" Text="{Binding SelectedProfile.TagsCsv, Mode=TwoWay}" />
                     </Grid>
 
-                    <ToggleSwitch Header="Favorite" IsOn="{Binding SelectedProfile.IsFavorite, Mode=TwoWay}" />
+                    <ToggleSwitch x:Uid="FavoriteSwitch" IsOn="{Binding SelectedProfile.IsFavorite, Mode=TwoWay}" />
 
-                    <TextBox Header="Plugin" Text="{Binding SelectedProfile.Plugin, Mode=TwoWay}"
-                             PlaceholderText="Optional (e.g. v2ray-plugin)" />
-                    <TextBox Header="Plugin options" Text="{Binding SelectedProfile.PluginOptions, Mode=TwoWay}"
-                             PlaceholderText="Optional" />
+                    <TextBox x:Uid="PluginBox" Text="{Binding SelectedProfile.Plugin, Mode=TwoWay}" />
+                    <TextBox x:Uid="PluginOptsBox" Text="{Binding SelectedProfile.PluginOptions, Mode=TwoWay}" />
 
                     <Border
                         Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
@@ -135,16 +132,15 @@
                         Padding="16"
                         Margin="0,8,0,0">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Import / Export" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                            <TextBlock x:Uid="ImportExportTitle" Style="{ThemeResource BodyStrongTextBlockStyle}" />
 
                             <Grid ColumnSpacing="8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBox Header="ss:// URI" Text="{Binding ImportText, Mode=TwoWay}"
-                                         PlaceholderText="Paste ss:// link to import" />
-                                <Button Grid.Column="1" Content="Import" Command="{Binding ImportCommand}"
+                                <TextBox x:Uid="ImportUriBox" Text="{Binding ImportText, Mode=TwoWay}" />
+                                <Button x:Uid="ImportBtn" Grid.Column="1" Command="{Binding ImportCommand}"
                                         VerticalAlignment="Bottom" Margin="0,0,0,1" />
                             </Grid>
 
@@ -153,8 +149,8 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBox Header="Exported URI" Text="{Binding ExportText}" IsReadOnly="True" />
-                                <Button Grid.Column="1" Content="Export" Command="{Binding ExportCommand}"
+                                <TextBox x:Uid="ExportUriBox" Text="{Binding ExportText}" IsReadOnly="True" />
+                                <Button x:Uid="ExportBtn" Grid.Column="1" Command="{Binding ExportCommand}"
                                         VerticalAlignment="Bottom" Margin="0,0,0,1" />
                             </Grid>
                         </StackPanel>

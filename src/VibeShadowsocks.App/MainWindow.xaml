@@ -16,27 +16,27 @@
             OpenPaneLength="200"
             SelectionChanged="OnNavigationSelectionChanged">
             <NavigationView.MenuItems>
-                <NavigationViewItem Content="Dashboard" Tag="dashboard">
+                <NavigationViewItem x:Uid="NavDashboard" Tag="dashboard">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE80F;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Servers" Tag="servers">
+                <NavigationViewItem x:Uid="NavServers" Tag="servers">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE968;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Routing / PAC" Tag="routing">
+                <NavigationViewItem x:Uid="NavRouting" Tag="routing">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE774;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Settings" Tag="settings">
+                <NavigationViewItem x:Uid="NavSettings" Tag="settings">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE713;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Logs" Tag="logs">
+                <NavigationViewItem x:Uid="NavLogs" Tag="logs">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE7BA;" />
                     </NavigationViewItem.Icon>

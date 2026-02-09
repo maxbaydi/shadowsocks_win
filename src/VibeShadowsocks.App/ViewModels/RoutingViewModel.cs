@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
+using VibeShadowsocks.App.Helpers;
 using VibeShadowsocks.Core.Abstractions;
 using VibeShadowsocks.Core.Models;
 
@@ -68,6 +69,8 @@ public partial class RoutingViewModel : ObservableObject
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SaveAndApplyCommand))]
     private bool _hasUnsavedChanges;
+
+    public string TooltipAddDomain => Loc.Get("TooltipAddDomain");
 
     public Visibility ManagedVisibility => IsRemotePac ? Visibility.Collapsed : Visibility.Visible;
     public Visibility RemoteVisibility => IsRemotePac ? Visibility.Visible : Visibility.Collapsed;
@@ -246,7 +249,7 @@ public partial class RoutingViewModel : ObservableObject
                 await _orchestrator.ApplyRoutingAsync();
             }
 
-            PacPreview = IsRemotePac ? $"Remote: {RemotePacUrl}" : _pacManager.GetPacPreview();
+            PacPreview = IsRemotePac ? Loc.Format("RemotePacFmt", RemotePacUrl) : _pacManager.GetPacPreview();
 
             _suppressHandlers = true;
             SelectedPacProfile = updatedProfile;
@@ -254,12 +257,12 @@ public partial class RoutingViewModel : ObservableObject
 
             HasUnsavedChanges = false;
             StatusMessage = IsRemotePac
-                ? "Remote PAC URL saved and applied."
-                : "Rules saved and applied.";
+                ? Loc.Get("RemotePacSaved")
+                : Loc.Get("RulesSaved");
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error: {ex.Message}";
+            StatusMessage = Loc.Format("ErrorFmt", ex.Message);
         }
         finally
         {
@@ -272,13 +275,13 @@ public partial class RoutingViewModel : ObservableObject
     {
         if (SelectedPacProfile is null)
         {
-            TestOutput = "No profile selected.";
+            TestOutput = Loc.Get("NoProfileSelected");
             return;
         }
 
         if (IsRemotePac)
         {
-            TestOutput = "Testing is not available for remote PAC scripts.";
+            TestOutput = Loc.Get("TestRemoteNA");
             return;
         }
 

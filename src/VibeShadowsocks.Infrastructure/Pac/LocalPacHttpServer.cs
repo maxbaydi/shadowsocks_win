@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
@@ -101,11 +101,9 @@ public sealed class LocalPacHttpServer(ILogger<LocalPacHttpServer> logger) : IAs
         }
         catch (HttpListenerException)
         {
-            // listener already closed.
         }
         catch (ObjectDisposedException)
         {
-            // listener already disposed.
         }
         finally
         {
@@ -174,7 +172,6 @@ public sealed class LocalPacHttpServer(ILogger<LocalPacHttpServer> logger) : IAs
             }
             catch
             {
-                // ignored
             }
         }
     }

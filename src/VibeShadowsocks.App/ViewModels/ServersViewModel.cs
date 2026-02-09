@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using VibeShadowsocks.App.Helpers;
 using VibeShadowsocks.Core.Abstractions;
 using VibeShadowsocks.Core.Importing;
 using VibeShadowsocks.Core.Models;
@@ -32,6 +33,8 @@ public partial class ServersViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isBusy;
+
+    public string TooltipSetActive => Loc.Get("TooltipSetActive");
 
     public ServersViewModel(ISettingsStore settingsStore, ISecureStorage secureStorage)
     {
@@ -70,7 +73,7 @@ public partial class ServersViewModel : ObservableObject
     {
         var profile = new ServerProfileItem
         {
-            Name = "New server",
+            Name = Loc.Get("NewServerName"),
             Port = 8388,
         };
 
@@ -95,7 +98,7 @@ public partial class ServersViewModel : ObservableObject
     {
         if (SelectedProfile is null)
         {
-            StatusMessage = "Select a server first.";
+            StatusMessage = Loc.Get("SelectServerFirst");
             return;
         }
 
@@ -111,7 +114,7 @@ public partial class ServersViewModel : ObservableObject
             ActiveServerProfileId = SelectedProfile.Id,
         });
 
-        StatusMessage = $"Active server: {SelectedProfile.Name}";
+        StatusMessage = Loc.Format("ActiveServerFmt", SelectedProfile.Name);
     }
 
     [RelayCommand]
@@ -142,7 +145,7 @@ public partial class ServersViewModel : ObservableObject
                 };
             });
 
-            StatusMessage = "Server profiles saved.";
+            StatusMessage = Loc.Get("ProfilesSaved");
         }
         finally
         {
@@ -164,12 +167,12 @@ public partial class ServersViewModel : ObservableObject
             SelectedProfile = item;
             ImportText = string.Empty;
 
-            StatusMessage = "Imported ss:// URI.";
+            StatusMessage = Loc.Get("ImportedUri");
             await SaveAsync();
         }
         catch (Exception exception)
         {
-            StatusMessage = $"Import failed: {exception.Message}";
+            StatusMessage = Loc.Format("ImportFailedFmt", exception.Message);
         }
         finally
         {
@@ -182,12 +185,12 @@ public partial class ServersViewModel : ObservableObject
     {
         if (SelectedProfile is null)
         {
-            StatusMessage = "No profile selected.";
+            StatusMessage = Loc.Get("NoProfileSelected");
             return;
         }
 
         var password = await _secureStorage.ReadSecretAsync(SelectedProfile.PasswordSecretId) ?? SelectedProfile.Password;
         ExportText = SsUriParser.Export(SelectedProfile.ToDomainModel(), password);
-        StatusMessage = "Export complete.";
+        StatusMessage = Loc.Get("ExportComplete");
     }
 }

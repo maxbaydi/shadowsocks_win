@@ -1,7 +1,8 @@
 param(
     [switch]$SkipInstaller,
     [switch]$KeepPdb,
-    [string]$SsLocalPath
+    [string]$SsLocalPath,
+    [string]$Version
 )
 
 $ErrorActionPreference = 'Stop'
@@ -10,10 +11,16 @@ $RepoRoot     = Split-Path $PSScriptRoot -Parent
 $ProjectPath  = Join-Path $RepoRoot 'src\VibeShadowsocks.App\VibeShadowsocks.App.csproj'
 $PublishDir   = Join-Path $RepoRoot 'dist\publish'
 $OutputDir    = Join-Path $RepoRoot 'dist\VibeShadowsocks'
-$InstallerIss = Join-Path $PSScriptRoot 'installer.iss'
-$InstallerOut = Join-Path $RepoRoot 'dist'
+$ReleaseDir   = Join-Path $RepoRoot 'dist\releases'
 
 $KeepLocales = @('en-us', 'en-US', 'ru', 'ru-RU')
+
+if (-not $Version) {
+    $propsFile = Join-Path $RepoRoot 'Directory.Build.props'
+    [xml]$props = Get-Content $propsFile
+    $Version = $props.Project.PropertyGroup.Version
+    if (-not $Version) { $Version = '1.0.0' }
+}
 
 function Write-Step($msg) { Write-Host "`n>>> $msg" -ForegroundColor Cyan }
 
@@ -22,13 +29,14 @@ if (Test-Path (Join-Path $RepoRoot 'dist')) {
     Remove-Item (Join-Path $RepoRoot 'dist') -Recurse -Force
 }
 
-Write-Step 'Publishing self-contained (win-x64)'
+Write-Step "Publishing self-contained (win-x64) v$Version"
 dotnet publish $ProjectPath `
     -c Release `
     -r win-x64 `
     --self-contained `
     -p:WindowsAppSDKSelfContained=true `
     -p:Platform=x64 `
+    -p:Version=$Version `
     -o $PublishDir
 
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed with exit code $LASTEXITCODE" }
@@ -74,42 +82,49 @@ $sizeMB    = [math]::Round((Get-ChildItem $OutputDir -Recurse -File | Measure-Ob
 Write-Step "Distribution ready: $fileCount files, $sizeMB MB"
 Write-Host "  Path: $OutputDir"
 
-$isccPath = $null
-$candidates = @(
-    'C:\InnoSetup6\ISCC.exe',
-    (Join-Path $env:ProgramFiles 'Inno Setup 6\ISCC.exe'),
-    'C:\Program Files (x86)\Inno Setup 6\ISCC.exe',
-    'C:\Program Files\Inno Setup 6\ISCC.exe'
-)
-foreach ($c in $candidates) {
-    if ($c -and (Test-Path $c)) { $isccPath = $c; break }
-}
-if (-not $isccPath) {
-    $cmd = Get-Command iscc -ErrorAction SilentlyContinue
-    if ($cmd) { $isccPath = $cmd.Source }
-}
+if (-not $SkipInstaller) {
+    Write-Step 'Installing/updating Velopack CLI (vpk)'
+    dotnet tool update -g vpk
 
-if (-not $SkipInstaller -and $isccPath -and (Test-Path $InstallerIss)) {
-    Write-Step 'Building installer with Inno Setup'
-    & $isccPath $InstallerIss "/DDistDir=$OutputDir" "/DOutputDir=$InstallerOut"
-    if ($LASTEXITCODE -ne 0) { throw 'Inno Setup compilation failed' }
-    Write-Host "  Installer created in $InstallerOut"
-} elseif (-not $SkipInstaller) {
-    Write-Host "`n[!] Inno Setup (ISCC.exe) not found - installer skipped." -ForegroundColor Yellow
-    Write-Host '    Install: winget install JRSoftware.InnoSetup'
+    New-Item $ReleaseDir -ItemType Directory -Force | Out-Null
+
+    $icoPath = Join-Path $OutputDir 'app.ico'
+
+    Write-Step "Packing Velopack release v$Version"
+    vpk pack `
+        --packId VibeShadowsocks `
+        --packVersion $Version `
+        --packDir $OutputDir `
+        --mainExe VibeShadowsocks.App.exe `
+        --icon $icoPath `
+        --packTitle "VibeShadowsocks" `
+        --outputDir $ReleaseDir
+
+    if ($LASTEXITCODE -ne 0) { throw "vpk pack failed with exit code $LASTEXITCODE" }
+
+    Write-Host "  Velopack artifacts created in $ReleaseDir"
+    Get-ChildItem $ReleaseDir | ForEach-Object {
+        $fSizeMB = [math]::Round($_.Length / 1MB, 1)
+        Write-Host "    $($_.Name) - ${fSizeMB} MB"
+    }
+} else {
+    Write-Host "`n[!] Installer build skipped (use without -SkipInstaller to build)." -ForegroundColor Yellow
 }
 
 Write-Step 'Creating portable ZIP'
-$zipPath = Join-Path $InstallerOut 'VibeShadowsocks-portable-win-x64.zip'
+$zipDir = Join-Path $RepoRoot 'dist'
+$zipPath = Join-Path $zipDir 'VibeShadowsocks-portable-win-x64.zip'
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 Compress-Archive -Path "$OutputDir\*" -DestinationPath $zipPath -CompressionLevel Optimal
 $zipItem = Get-Item $zipPath
 $zipSizeMB = [math]::Round($zipItem.Length / 1MB, 1)
 Write-Host "  ZIP: $zipPath - ${zipSizeMB} MB"
 
-Write-Step 'Build complete!'
+Write-Step "Build complete! (v$Version)"
 Write-Host "  Portable ZIP : $zipPath"
-$installerExe = Join-Path $InstallerOut 'VibeShadowsocks-Setup.exe'
-if (Test-Path $installerExe) {
-    Write-Host "  Installer    : $installerExe"
+if (Test-Path $ReleaseDir) {
+    $setupExe = Get-ChildItem $ReleaseDir -Filter '*Setup*' | Select-Object -First 1
+    if ($setupExe) {
+        Write-Host "  Installer    : $($setupExe.FullName)"
+    }
 }

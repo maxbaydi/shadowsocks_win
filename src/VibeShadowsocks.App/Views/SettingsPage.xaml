@@ -12,11 +12,11 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Settings" Style="{ThemeResource TitleTextBlockStyle}" VerticalAlignment="Center" />
+                <TextBlock x:Uid="SettingsTitle" Style="{ThemeResource TitleTextBlockStyle}" VerticalAlignment="Center" />
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <ProgressRing IsActive="{Binding IsBusy}" Width="20" Height="20" />
-                    <Button Content="Save" Command="{Binding SaveCommand}" Style="{ThemeResource AccentButtonStyle}" MinWidth="80" />
-                    <Button Content="Reload" Command="{Binding LoadCommand}" MinWidth="80" />
+                    <Button x:Uid="SaveBtn" Command="{Binding SaveCommand}" Style="{ThemeResource AccentButtonStyle}" MinWidth="80" />
+                    <Button x:Uid="ReloadBtn" Command="{Binding LoadCommand}" MinWidth="80" />
                 </StackPanel>
             </Grid>
 
@@ -27,10 +27,13 @@
                 CornerRadius="8"
                 Padding="20">
                 <StackPanel Spacing="12">
-                    <TextBlock Text="General" Style="{ThemeResource SubtitleTextBlockStyle}" />
-                    <ToggleSwitch Header="Start with Windows" IsOn="{Binding AutoStart, Mode=TwoWay}" />
-                    <ToggleSwitch Header="Auto-connect on startup" IsOn="{Binding AutoConnect, Mode=TwoWay}" />
-                    <ToggleSwitch Header="Close button minimizes to tray" IsOn="{Binding MinimizeToTrayOnClose, Mode=TwoWay}" />
+                    <TextBlock x:Uid="LanguageSection" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <ComboBox
+                        x:Uid="LanguageBox"
+                        ItemsSource="{Binding Languages}"
+                        SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                        MinWidth="200" />
+                    <TextBlock Text="{Binding LanguageStatusMessage}" Opacity="0.7" FontSize="13" TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
 
@@ -41,15 +44,55 @@
                 CornerRadius="8"
                 Padding="20">
                 <StackPanel Spacing="12">
-                    <TextBlock Text="sslocal" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <TextBlock x:Uid="UpdateSection" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <TextBlock Text="{Binding CurrentVersion}" Opacity="0.7" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Uid="CheckUpdateBtn"
+                                Command="{Binding CheckUpdateCommand}"
+                                IsEnabled="{Binding IsCheckingUpdate, Converter={StaticResource InvertBoolConverter}}" />
+                        <ProgressRing IsActive="{Binding IsCheckingUpdate}" Width="20" Height="20" />
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisConverter}}" Spacing="8">
+                        <Button x:Uid="InstallUpdateBtn"
+                                Command="{Binding DownloadAndApplyUpdateCommand}"
+                                Style="{ThemeResource AccentButtonStyle}"
+                                IsEnabled="{Binding IsDownloadingUpdate, Converter={StaticResource InvertBoolConverter}}" />
+                        <ProgressBar Value="{Binding DownloadProgress}" Maximum="100"
+                                     Visibility="{Binding IsDownloadingUpdate, Converter={StaticResource BoolToVisConverter}}" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding UpdateStatus}" TextWrapping="Wrap" Opacity="0.8" />
+                </StackPanel>
+            </Border>
+
+            <Border
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20">
+                <StackPanel Spacing="12">
+                    <TextBlock x:Uid="GeneralSection" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <ToggleSwitch x:Uid="AutoStartSwitch" IsOn="{Binding AutoStart, Mode=TwoWay}" />
+                    <ToggleSwitch x:Uid="AutoConnectSwitch" IsOn="{Binding AutoConnect, Mode=TwoWay}" />
+                    <ToggleSwitch x:Uid="MinToTraySwitch" IsOn="{Binding MinimizeToTrayOnClose, Mode=TwoWay}" />
+                </StackPanel>
+            </Border>
+
+            <Border
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20">
+                <StackPanel Spacing="12">
+                    <TextBlock x:Uid="SslocalSection" Style="{ThemeResource SubtitleTextBlockStyle}" />
                     <Grid ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBox Header="sslocal.exe path" Text="{Binding SsLocalPath, Mode=TwoWay}"
-                                 PlaceholderText="Leave empty for default (tools/sslocal/sslocal.exe)" />
-                        <Button Grid.Column="1" Content="Browse..." Click="OnBrowseSsLocal" VerticalAlignment="Bottom" Margin="0,0,0,1" />
+                        <TextBox x:Uid="SsLocalPathBox" Text="{Binding SsLocalPath, Mode=TwoWay}" />
+                        <Button x:Uid="BrowseBtn" Grid.Column="1" Click="OnBrowseSsLocal" VerticalAlignment="Bottom" Margin="0,0,0,1" />
                     </Grid>
                 </StackPanel>
             </Border>
@@ -61,15 +104,15 @@
                 CornerRadius="8"
                 Padding="20">
                 <StackPanel Spacing="12">
-                    <TextBlock Text="Network" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <TextBlock x:Uid="NetworkSection" Style="{ThemeResource SubtitleTextBlockStyle}" />
                     <Grid ColumnSpacing="16">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <NumberBox Header="SOCKS port" Value="{Binding SocksPort, Mode=TwoWay}"
+                        <NumberBox x:Uid="SocksPortBox" Value="{Binding SocksPort, Mode=TwoWay}"
                                    Minimum="1" Maximum="65535" SpinButtonPlacementMode="Compact" />
-                        <NumberBox Grid.Column="1" Header="PAC server port" Value="{Binding PacPort, Mode=TwoWay}"
+                        <NumberBox x:Uid="PacPortBox" Grid.Column="1" Value="{Binding PacPort, Mode=TwoWay}"
                                    Minimum="1" Maximum="65535" SpinButtonPlacementMode="Compact" />
                     </Grid>
                 </StackPanel>
@@ -82,10 +125,9 @@
                 CornerRadius="8"
                 Padding="20">
                 <StackPanel Spacing="12">
-                    <TextBlock Text="Hotkey" Style="{ThemeResource SubtitleTextBlockStyle}" />
-                    <TextBox Header="Global hotkey (toggle connect/disconnect)"
-                             Text="{Binding HotkeyText, Mode=TwoWay}"
-                             PlaceholderText="e.g. Ctrl+Alt+Shift+P" />
+                    <TextBlock x:Uid="HotkeySection" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <TextBox x:Uid="HotkeyBox"
+                             Text="{Binding HotkeyText, Mode=TwoWay}" />
                 </StackPanel>
             </Border>
 
@@ -96,9 +138,9 @@
                 CornerRadius="8"
                 Padding="20">
                 <StackPanel Spacing="12">
-                    <TextBlock Text="Logging" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <TextBlock x:Uid="LoggingSection" Style="{ThemeResource SubtitleTextBlockStyle}" />
                     <ComboBox
-                        Header="Log level"
+                        x:Uid="LogLevelBox"
                         ItemsSource="{Binding LogLevels}"
                         SelectedItem="{Binding LogLevel, Mode=TwoWay}"
                         MinWidth="200" />

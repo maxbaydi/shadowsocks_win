@@ -1,4 +1,4 @@
-﻿namespace VibeShadowsocks.Core.Models;
+namespace VibeShadowsocks.Core.Models;
 
 public sealed record AppSettings
 {
@@ -29,6 +29,8 @@ public sealed record AppSettings
     public List<PacProfile> PacProfiles { get; init; } = [];
 
     public string LogLevel { get; init; } = "Information";
+
+    public string Language { get; init; } = "en-US";
 
     public int DiagnosticsLogTailLines { get; init; } = 300;
 
