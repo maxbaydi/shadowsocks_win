@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.Windows.Forms;
 using VibeShadowsocks.Core.Models;
 using VibeShadowsocks.Core.Orchestration;
@@ -31,7 +31,7 @@ public sealed class TrayManager : ITrayManager
 
     public event EventHandler<RoutingMode>? RoutingModeChanged;
 
-    public void Initialize(string appName)
+    public void Initialize(string appName, string? iconPath = null)
     {
         if (_initialized)
         {
@@ -39,7 +39,7 @@ public sealed class TrayManager : ITrayManager
         }
 
         _notifyIcon.Text = appName;
-        _notifyIcon.Icon = SystemIcons.Shield;
+        _notifyIcon.Icon = ResolveIcon(iconPath);
         _notifyIcon.Visible = true;
         _notifyIcon.ContextMenuStrip = _menu;
         _notifyIcon.DoubleClick += (_, _) => OpenRequested?.Invoke(this, EventArgs.Empty);
@@ -84,7 +84,7 @@ public sealed class TrayManager : ITrayManager
     {
         _notifyIcon.BalloonTipTitle = title;
         _notifyIcon.BalloonTipText = message;
-        _notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
+        _notifyIcon.BalloonTipIcon = ToolTipIcon.None;
         _notifyIcon.ShowBalloonTip(3000);
     }
 
@@ -101,5 +101,22 @@ public sealed class TrayManager : ITrayManager
         _routingGlobalItem.Checked = routingMode == RoutingMode.Global;
         _routingPacItem.Checked = routingMode == RoutingMode.Pac;
         RoutingModeChanged?.Invoke(this, routingMode);
+    }
+
+    private static Icon ResolveIcon(string? iconPath)
+    {
+        if (!string.IsNullOrEmpty(iconPath) && File.Exists(iconPath))
+        {
+            try
+            {
+                return new Icon(iconPath);
+            }
+            catch
+            {
+                // fallback
+            }
+        }
+
+        return SystemIcons.Shield;
     }
 }

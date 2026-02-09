@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using VibeShadowsocks.Core.Abstractions;
@@ -19,6 +19,9 @@ public partial class ServersViewModel : ObservableObject
     private ServerProfileItem? _selectedProfile;
 
     [ObservableProperty]
+    private string _activeServerId = string.Empty;
+
+    [ObservableProperty]
     private string _importText = string.Empty;
 
     [ObservableProperty]
@@ -26,6 +29,9 @@ public partial class ServersViewModel : ObservableObject
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
+
+    [ObservableProperty]
+    private bool _isBusy;
 
     public ServersViewModel(ISettingsStore settingsStore, ISecureStorage secureStorage)
     {
@@ -35,18 +41,28 @@ public partial class ServersViewModel : ObservableObject
 
     public async Task LoadAsync()
     {
-        var settings = await _settingsStore.LoadAsync();
-        var items = new List<ServerProfileItem>();
-
-        foreach (var profile in settings.ServerProfiles)
+        IsBusy = true;
+        try
         {
-            var item = ServerProfileItem.FromDomainModel(profile);
-            item.Password = await _secureStorage.ReadSecretAsync(item.PasswordSecretId) ?? string.Empty;
-            items.Add(item);
-        }
+            var settings = await _settingsStore.LoadAsync();
+            var items = new List<ServerProfileItem>();
 
-        Profiles = new ObservableCollection<ServerProfileItem>(items);
-        SelectedProfile = Profiles.FirstOrDefault();
+            foreach (var profile in settings.ServerProfiles)
+            {
+                var item = ServerProfileItem.FromDomainModel(profile);
+                item.Password = await _secureStorage.ReadSecretAsync(item.PasswordSecretId) ?? string.Empty;
+                item.IsActive = profile.Id == settings.ActiveServerProfileId;
+                items.Add(item);
+            }
+
+            Profiles = new ObservableCollection<ServerProfileItem>(items);
+            ActiveServerId = settings.ActiveServerProfileId ?? string.Empty;
+            SelectedProfile = Profiles.FirstOrDefault(p => p.IsActive) ?? Profiles.FirstOrDefault();
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand]
@@ -75,36 +91,69 @@ public partial class ServersViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task SaveAsync()
+    private async Task SetActiveAsync()
     {
-        foreach (var profile in Profiles)
+        if (SelectedProfile is null)
         {
-            await _secureStorage.SaveSecretAsync(profile.PasswordSecretId, profile.Password);
+            StatusMessage = "Select a server first.";
+            return;
         }
 
-        var domainProfiles = Profiles.Select(profile => profile.ToDomainModel()).ToList();
-
-        await _settingsStore.UpdateAsync(settings =>
+        foreach (var profile in Profiles)
         {
-            var activeId = settings.ActiveServerProfileId;
-            if (string.IsNullOrWhiteSpace(activeId) || domainProfiles.All(profile => profile.Id != activeId))
-            {
-                activeId = domainProfiles.FirstOrDefault()?.Id;
-            }
+            profile.IsActive = profile.Id == SelectedProfile.Id;
+        }
 
-            return settings with
-            {
-                ServerProfiles = domainProfiles,
-                ActiveServerProfileId = activeId,
-            };
+        ActiveServerId = SelectedProfile.Id;
+
+        await _settingsStore.UpdateAsync(settings => settings with
+        {
+            ActiveServerProfileId = SelectedProfile.Id,
         });
 
-        StatusMessage = "Server profiles saved.";
+        StatusMessage = $"Active server: {SelectedProfile.Name}";
+    }
+
+    [RelayCommand]
+    private async Task SaveAsync()
+    {
+        IsBusy = true;
+        try
+        {
+            foreach (var profile in Profiles)
+            {
+                await _secureStorage.SaveSecretAsync(profile.PasswordSecretId, profile.Password);
+            }
+
+            var domainProfiles = Profiles.Select(profile => profile.ToDomainModel()).ToList();
+
+            await _settingsStore.UpdateAsync(settings =>
+            {
+                var activeId = settings.ActiveServerProfileId;
+                if (string.IsNullOrWhiteSpace(activeId) || domainProfiles.All(profile => profile.Id != activeId))
+                {
+                    activeId = domainProfiles.FirstOrDefault()?.Id;
+                }
+
+                return settings with
+                {
+                    ServerProfiles = domainProfiles,
+                    ActiveServerProfileId = activeId,
+                };
+            });
+
+            StatusMessage = "Server profiles saved.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand]
     private async Task ImportAsync()
     {
+        IsBusy = true;
         try
         {
             var profile = SsUriParser.Parse(ImportText, out var password);
@@ -113,6 +162,7 @@ public partial class ServersViewModel : ObservableObject
 
             Profiles.Add(item);
             SelectedProfile = item;
+            ImportText = string.Empty;
 
             StatusMessage = "Imported ss:// URI.";
             await SaveAsync();
@@ -120,6 +170,10 @@ public partial class ServersViewModel : ObservableObject
         catch (Exception exception)
         {
             StatusMessage = $"Import failed: {exception.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 

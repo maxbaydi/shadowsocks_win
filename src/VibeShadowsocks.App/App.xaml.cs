@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
@@ -28,6 +28,7 @@ public partial class App : Application
     private IConnectionOrchestrator? _orchestrator;
     private ISettingsStore? _settingsStore;
     private DispatcherQueue? _dispatcherQueue;
+    private ILogger<App>? _logger;
 
     public App()
     {
@@ -44,53 +45,76 @@ public partial class App : Application
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
-        await Host.StartAsync();
-
-        _singleInstanceManager = GetService<ISingleInstanceManager>();
-        var isPrimaryInstance = await _singleInstanceManager
-            .InitializeAsync("default", CancellationToken.None)
-            ;
-
-        if (!isPrimaryInstance)
+        try
         {
-            await Host.StopAsync();
-            Exit();
-            return;
+            await Host.StartAsync();
+            _logger = GetService<ILogger<App>>();
+
+            _singleInstanceManager = GetService<ISingleInstanceManager>();
+            var isPrimaryInstance = await _singleInstanceManager
+                .InitializeAsync("default", CancellationToken.None);
+
+            _logger.LogInformation("Single-instance check: IsPrimary={IsPrimary}", isPrimaryInstance);
+
+            if (!isPrimaryInstance)
+            {
+                _logger.LogInformation("Secondary instance detected. Exiting after activation signal.");
+                await Host.StopAsync();
+                Exit();
+                return;
+            }
+
+            _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+            _trayManager = GetService<ITrayManager>();
+            _hotkeyManager = GetService<IHotkeyManager>();
+            _orchestrator = GetService<IConnectionOrchestrator>();
+            _settingsStore = GetService<ISettingsStore>();
+
+            _singleInstanceManager.ActivationRequested += OnActivationRequested;
+            _trayManager.ConnectRequested += (_, _) => _ = _orchestrator.ConnectAsync();
+            _trayManager.DisconnectRequested += (_, _) => _ = _orchestrator.DisconnectAsync();
+            _trayManager.OpenRequested += (_, _) => ActivateMainWindow();
+            _trayManager.ExitRequested += (_, _) => _ = ShutdownAsync();
+            _trayManager.RoutingModeChanged += (_, mode) => _ = ApplyRoutingModeAsync(mode);
+            _orchestrator.StateChanged += OnOrchestratorStateChanged;
+            _hotkeyManager.HotkeyPressed += (_, _) => _ = _orchestrator.ToggleAsync();
+
+            await _orchestrator.RecoverProxyStateAsync();
+
+            var settings = await _settingsStore.LoadAsync();
+
+            var iconPath = Path.Combine(AppContext.BaseDirectory, "app.ico");
+            _trayManager.Initialize("VibeShadowsocks", iconPath);
+            _trayManager.UpdateState(_orchestrator.Snapshot.State, settings.RoutingMode);
+
+            if (!_hotkeyManager.Register(settings.Hotkey, out var hotkeyError))
+            {
+                _trayManager.ShowNotification("VibeShadowsocks", $"Hotkey conflict: {hotkeyError}");
+            }
+
+            _logger.LogInformation("Creating MainWindow...");
+            _window = GetService<MainWindow>();
+            _logger.LogInformation("MainWindow created. Activating...");
+            _window.Activate();
+
+            if (settings.AutoConnect)
+            {
+                _ = _orchestrator.ConnectAsync();
+            }
         }
-
-        _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
-        _trayManager = GetService<ITrayManager>();
-        _hotkeyManager = GetService<IHotkeyManager>();
-        _orchestrator = GetService<IConnectionOrchestrator>();
-        _settingsStore = GetService<ISettingsStore>();
-
-        _singleInstanceManager.ActivationRequested += OnActivationRequested;
-        _trayManager.ConnectRequested += (_, _) => _ = _orchestrator.ConnectAsync();
-        _trayManager.DisconnectRequested += (_, _) => _ = _orchestrator.DisconnectAsync();
-        _trayManager.OpenRequested += (_, _) => ActivateMainWindow();
-        _trayManager.ExitRequested += (_, _) => _ = ShutdownAsync();
-        _trayManager.RoutingModeChanged += (_, mode) => _ = ApplyRoutingModeAsync(mode);
-        _orchestrator.StateChanged += OnOrchestratorStateChanged;
-        _hotkeyManager.HotkeyPressed += (_, _) => _ = _orchestrator.ToggleAsync();
-
-        await _orchestrator.RecoverProxyStateAsync();
-
-        var settings = await _settingsStore.LoadAsync();
-
-        _trayManager.Initialize("VibeShadowsocks");
-        _trayManager.UpdateState(_orchestrator.Snapshot.State, settings.RoutingMode);
-
-        if (!_hotkeyManager.Register(settings.Hotkey, out var hotkeyError))
+        catch (Exception exception)
         {
-            _trayManager.ShowNotification("VibeShadowsocks", $"Hotkey conflict: {hotkeyError}");
-        }
+            try
+            {
+                _logger?.LogError(exception, "Fatal startup failure in OnLaunched.");
+                Console.Error.WriteLine(exception);
+            }
+            catch
+            {
+                // ignored
+            }
 
-        _window = GetService<MainWindow>();
-        _window.Activate();
-
-        if (settings.AutoConnect)
-        {
-            _ = _orchestrator.ConnectAsync();
+            await ShutdownAsync();
         }
     }
 
@@ -137,9 +161,18 @@ public partial class App : Application
         _dispatcherQueue?.TryEnqueue(() =>
         {
             _trayManager.UpdateState(eventArgs.Snapshot.State, settings.RoutingMode);
-            if (eventArgs.Snapshot.State == ConnectionState.Faulted)
+
+            var (title, message) = eventArgs.Snapshot.State switch
             {
-                _trayManager.ShowNotification("VibeShadowsocks", eventArgs.Snapshot.Message);
+                ConnectionState.Connected => ("Connected", $"Server: {settings.GetActiveServerProfile()?.Name ?? "Unknown"}"),
+                ConnectionState.Disconnected => ("Disconnected", "VPN tunnel closed"),
+                ConnectionState.Faulted => ("Error", eventArgs.Snapshot.Message),
+                _ => (null as string, null as string),
+            };
+
+            if (title is not null)
+            {
+                _trayManager.ShowNotification("VibeShadowsocks", $"{title} — {message}");
             }
         });
     }
@@ -152,8 +185,7 @@ public partial class App : Application
         }
 
         await _settingsStore
-            .UpdateAsync(settings => settings with { RoutingMode = routingMode })
-            ;
+            .UpdateAsync(settings => settings with { RoutingMode = routingMode });
 
         await _orchestrator.ApplyRoutingAsync();
     }
@@ -175,6 +207,16 @@ public partial class App : Application
 
     private async void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs eventArgs)
     {
+        try
+        {
+            _logger?.LogError(eventArgs.Exception, "Unhandled UI exception.");
+            Console.Error.WriteLine(eventArgs.Exception);
+        }
+        catch
+        {
+            // ignored
+        }
+
         eventArgs.Handled = true;
 
         if (_orchestrator is not null)
@@ -234,4 +276,3 @@ public partial class App : Application
         Exit();
     }
 }
-

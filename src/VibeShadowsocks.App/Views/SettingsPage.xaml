@@ -1,30 +1,111 @@
-﻿<Page
+<Page
     x:Class="VibeShadowsocks.App.Views.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <ScrollViewer>
-        <StackPanel Padding="16" Spacing="10">
-            <TextBlock Text="Settings" Style="{ThemeResource TitleTextBlockStyle}" />
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Padding="24,20,24,24" Spacing="16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Settings" Style="{ThemeResource TitleTextBlockStyle}" VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <ProgressRing IsActive="{Binding IsBusy}" Width="20" Height="20" />
+                    <Button Content="Save" Command="{Binding SaveCommand}" Style="{ThemeResource AccentButtonStyle}" MinWidth="80" />
+                    <Button Content="Reload" Command="{Binding LoadCommand}" MinWidth="80" />
+                </StackPanel>
+            </Grid>
 
-            <ToggleSwitch Header="Autostart" IsOn="{Binding AutoStart, Mode=TwoWay}" />
-            <ToggleSwitch Header="Autoconnect" IsOn="{Binding AutoConnect, Mode=TwoWay}" />
-            <ToggleSwitch Header="Close button minimizes to tray" IsOn="{Binding MinimizeToTrayOnClose, Mode=TwoWay}" />
+            <Border
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="General" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <ToggleSwitch Header="Start with Windows" IsOn="{Binding AutoStart, Mode=TwoWay}" />
+                    <ToggleSwitch Header="Auto-connect on startup" IsOn="{Binding AutoConnect, Mode=TwoWay}" />
+                    <ToggleSwitch Header="Close button minimizes to tray" IsOn="{Binding MinimizeToTrayOnClose, Mode=TwoWay}" />
+                </StackPanel>
+            </Border>
 
-            <TextBox Header="sslocal.exe path" Text="{Binding SsLocalPath, Mode=TwoWay}" />
-            <NumberBox Header="SOCKS port" Value="{Binding SocksPort, Mode=TwoWay}" Minimum="1" Maximum="65535" SpinButtonPlacementMode="Compact" />
-            <NumberBox Header="PAC server port" Value="{Binding PacPort, Mode=TwoWay}" Minimum="1" Maximum="65535" SpinButtonPlacementMode="Compact" />
-            <TextBox Header="Hotkey (example: Ctrl+Alt+Shift+P)" Text="{Binding HotkeyText, Mode=TwoWay}" />
-            <TextBox Header="Log level" Text="{Binding LogLevel, Mode=TwoWay}" />
+            <Border
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="sslocal" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Header="sslocal.exe path" Text="{Binding SsLocalPath, Mode=TwoWay}"
+                                 PlaceholderText="Leave empty for default (tools/sslocal/sslocal.exe)" />
+                        <Button Grid.Column="1" Content="Browse..." Click="OnBrowseSsLocal" VerticalAlignment="Bottom" Margin="0,0,0,1" />
+                    </Grid>
+                </StackPanel>
+            </Border>
 
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Content="Save" Command="{Binding SaveCommand}" />
-                <Button Content="Reload" Command="{Binding LoadCommand}" />
-            </StackPanel>
+            <Border
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Network" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <NumberBox Header="SOCKS port" Value="{Binding SocksPort, Mode=TwoWay}"
+                                   Minimum="1" Maximum="65535" SpinButtonPlacementMode="Compact" />
+                        <NumberBox Grid.Column="1" Header="PAC server port" Value="{Binding PacPort, Mode=TwoWay}"
+                                   Minimum="1" Maximum="65535" SpinButtonPlacementMode="Compact" />
+                    </Grid>
+                </StackPanel>
+            </Border>
 
-            <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+            <Border
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Hotkey" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <TextBox Header="Global hotkey (toggle connect/disconnect)"
+                             Text="{Binding HotkeyText, Mode=TwoWay}"
+                             PlaceholderText="e.g. Ctrl+Alt+Shift+P" />
+                </StackPanel>
+            </Border>
+
+            <Border
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Logging" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <ComboBox
+                        Header="Log level"
+                        ItemsSource="{Binding LogLevels}"
+                        SelectedItem="{Binding LogLevel, Mode=TwoWay}"
+                        MinWidth="200" />
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" Opacity="0.8" />
         </StackPanel>
     </ScrollViewer>
 </Page>

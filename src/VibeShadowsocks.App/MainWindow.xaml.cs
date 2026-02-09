@@ -1,9 +1,10 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using VibeShadowsocks.App.ViewModels;
 using VibeShadowsocks.Core.Abstractions;
+using VibeShadowsocks.Core.Models;
 using WinRT.Interop;
 
 namespace VibeShadowsocks.App;
@@ -14,6 +15,7 @@ public sealed partial class MainWindow : Window
     private readonly ISettingsStore _settingsStore;
     private readonly AppWindow _appWindow;
     private bool _allowClose;
+    private bool _minimizeToTrayOnClose = true;
 
     public MainWindow(MainViewModel viewModel, ISettingsStore settingsStore)
     {
@@ -26,9 +28,18 @@ public sealed partial class MainWindow : Window
         var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
         _appWindow = AppWindow.GetFromWindowId(windowId);
         _appWindow.Closing += OnAppWindowClosing;
+        _appWindow.Resize(new Windows.Graphics.SizeInt32(960, 680));
+
+        var iconPath = Path.Combine(AppContext.BaseDirectory, "app.ico");
+        if (File.Exists(iconPath))
+        {
+            _appWindow.SetIcon(iconPath);
+        }
 
         RootNavigation.SelectedItem = RootNavigation.MenuItems.FirstOrDefault();
         ContentFrame.Navigate(typeof(Views.DashboardPage));
+
+        _ = CacheSettingsAsync();
     }
 
     public void ShowAndActivate()
@@ -43,6 +54,19 @@ public sealed partial class MainWindow : Window
     public void AllowClose()
     {
         _allowClose = true;
+    }
+
+    private async Task CacheSettingsAsync()
+    {
+        try
+        {
+            var settings = await _settingsStore.LoadAsync();
+            _minimizeToTrayOnClose = settings.MinimizeToTrayOnClose;
+        }
+        catch
+        {
+            _minimizeToTrayOnClose = true;
+        }
     }
 
     private void OnNavigationSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -79,18 +103,10 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        try
+        if (_minimizeToTrayOnClose)
         {
-            var settings = _settingsStore.LoadAsync().GetAwaiter().GetResult();
-            if (settings.MinimizeToTrayOnClose)
-            {
-                args.Cancel = true;
-                sender.Hide();
-            }
-        }
-        catch
-        {
-            // fallback to normal close when settings are unavailable.
+            args.Cancel = true;
+            sender.Hide();
         }
     }
 }

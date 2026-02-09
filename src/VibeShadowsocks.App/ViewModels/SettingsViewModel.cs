@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using VibeShadowsocks.Core.Abstractions;
 using VibeShadowsocks.Core.Models;
@@ -40,6 +40,11 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _statusMessage = string.Empty;
 
+    [ObservableProperty]
+    private bool _isBusy;
+
+    public IReadOnlyList<string> LogLevels { get; } = ["Trace", "Debug", "Information", "Warning", "Error", "Critical"];
+
     public SettingsViewModel(ISettingsStore settingsStore, IHotkeyManager hotkeyManager, IStartupManager startupManager)
     {
         _settingsStore = settingsStore;
@@ -78,24 +83,32 @@ public partial class SettingsViewModel : ObservableObject
             return;
         }
 
-        await _startupManager.SetEnabledAsync(AutoStart);
-
-        await _settingsStore.UpdateAsync(settings => settings with
+        IsBusy = true;
+        try
         {
-            AutoStart = AutoStart,
-            AutoConnect = AutoConnect,
-            MinimizeToTrayOnClose = MinimizeToTrayOnClose,
-            SsLocalExecutablePath = string.IsNullOrWhiteSpace(SsLocalPath) ? null : SsLocalPath,
-            Ports = settings.Ports with
-            {
-                SocksPort = SocksPort,
-                PacServerPort = PacPort,
-            },
-            Hotkey = hotkey,
-            LogLevel = LogLevel,
-        });
+            await _startupManager.SetEnabledAsync(AutoStart);
 
-        StatusMessage = "Settings saved.";
+            await _settingsStore.UpdateAsync(settings => settings with
+            {
+                AutoStart = AutoStart,
+                AutoConnect = AutoConnect,
+                MinimizeToTrayOnClose = MinimizeToTrayOnClose,
+                SsLocalExecutablePath = string.IsNullOrWhiteSpace(SsLocalPath) ? null : SsLocalPath,
+                Ports = settings.Ports with
+                {
+                    SocksPort = SocksPort,
+                    PacServerPort = PacPort,
+                },
+                Hotkey = hotkey,
+                LogLevel = LogLevel,
+            });
+
+            StatusMessage = "Settings saved.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private static bool TryParseHotkey(string value, out HotkeyGesture gesture, out string error)

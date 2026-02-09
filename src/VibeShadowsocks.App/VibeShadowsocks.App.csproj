@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
@@ -12,11 +12,29 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
+    <ApplicationIcon>app.ico</ApplicationIcon>
     <AppxMSBuildToolsPath Condition="'$(AppxMSBuildToolsPath)'=='' and Exists('$(ProgramFiles)\Microsoft Visual Studio\18\BuildTools\MSBuild\Microsoft\VisualStudio\v18.0\AppxPackage\Microsoft.Build.Packaging.Pri.Tasks.dll')">$(ProgramFiles)\Microsoft Visual Studio\18\BuildTools\MSBuild\Microsoft\VisualStudio\v18.0\AppxPackage\</AppxMSBuildToolsPath>
     <AppxMSBuildToolsPath Condition="'$(AppxMSBuildToolsPath)'=='' and Exists('$(ProgramFiles)\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VisualStudio\v18.0\AppxPackage\Microsoft.Build.Packaging.Pri.Tasks.dll')">$(ProgramFiles)\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VisualStudio\v18.0\AppxPackage\</AppxMSBuildToolsPath>
     <AppxMSBuildToolsPath Condition="'$(AppxMSBuildToolsPath)'=='' and Exists('$(ProgramFiles)\Microsoft Visual Studio\17\BuildTools\MSBuild\Microsoft\VisualStudio\v17.0\AppxPackage\Microsoft.Build.Packaging.Pri.Tasks.dll')">$(ProgramFiles)\Microsoft Visual Studio\17\BuildTools\MSBuild\Microsoft\VisualStudio\v17.0\AppxPackage\</AppxMSBuildToolsPath>
     <AppxMSBuildToolsPath Condition="'$(AppxMSBuildToolsPath)'=='' and Exists('$(ProgramFiles)\Microsoft Visual Studio\17\Community\MSBuild\Microsoft\VisualStudio\v17.0\AppxPackage\Microsoft.Build.Packaging.Pri.Tasks.dll')">$(ProgramFiles)\Microsoft Visual Studio\17\Community\MSBuild\Microsoft\VisualStudio\v17.0\AppxPackage\</AppxMSBuildToolsPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="app.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="logo.png" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <Target Name="_CopyWinUiResourcesToPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_PriFiles Include="$(OutputPath)\*.pri" />
+      <_RootXbf Include="$(OutputPath)\*.xbf" />
+      <_ViewsXbf Include="$(OutputPath)\Views\**\*.xbf" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_PriFiles)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_RootXbf)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_ViewsXbf)" DestinationFolder="$(PublishDir)\Views\%(RecursiveDir)" SkipUnchangedFiles="true" />
+    <Message Importance="high" Text="Copied WinUI resources (.pri, .xbf) to publish output." />
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240607001" />

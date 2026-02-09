@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using VibeShadowsocks.Core.Models;
 
 namespace VibeShadowsocks.App.ViewModels;
@@ -32,12 +32,17 @@ public partial class ServerProfileItem : ObservableObject
     private bool _isFavorite;
 
     [ObservableProperty]
+    private bool _isActive;
+
+    [ObservableProperty]
     private string? _plugin;
 
     [ObservableProperty]
     private string? _pluginOptions;
 
     public string PasswordSecretId { get; set; } = Guid.NewGuid().ToString("N");
+
+    public string DisplaySummary => string.IsNullOrWhiteSpace(Host) ? Name : $"{Host}:{Port}";
 
     public ServerProfile ToDomainModel() => new()
     {

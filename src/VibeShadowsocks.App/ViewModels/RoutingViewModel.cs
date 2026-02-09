@@ -1,6 +1,7 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
 using VibeShadowsocks.Core.Abstractions;
 using VibeShadowsocks.Core.Models;
 
@@ -11,9 +12,7 @@ public partial class RoutingViewModel : ObservableObject
     private readonly ISettingsStore _settingsStore;
     private readonly IConnectionOrchestrator _orchestrator;
     private readonly IPacManager _pacManager;
-
-    [ObservableProperty]
-    private string _selectedRoutingMode = "Off";
+    private bool _suppressHandlers;
 
     [ObservableProperty]
     private ObservableCollection<PacProfile> _pacProfiles = [];
@@ -22,23 +21,61 @@ public partial class RoutingViewModel : ObservableObject
     private PacProfile? _selectedPacProfile;
 
     [ObservableProperty]
+    private bool _isRemotePac;
+
+    [ObservableProperty]
+    private string _remotePacUrl = string.Empty;
+
+    [ObservableProperty]
+    private ObservableCollection<string> _proxyDomains = [];
+
+    [ObservableProperty]
+    private ObservableCollection<string> _directDomains = [];
+
+    [ObservableProperty]
+    private string _newProxyDomain = string.Empty;
+
+    [ObservableProperty]
+    private string _newDirectDomain = string.Empty;
+
+    [ObservableProperty]
+    private bool _defaultActionIsProxy = true;
+
+    [ObservableProperty]
+    private bool _bypassPrivateAddresses = true;
+
+    [ObservableProperty]
+    private bool _bypassSimpleHostnames = true;
+
+    [ObservableProperty]
+    private string _rulesUrl = string.Empty;
+
+    [ObservableProperty]
     private string _pacPreview = string.Empty;
 
     [ObservableProperty]
-    private string _testInput = "https://example.com";
+    private string _testInput = "https://google.com";
 
     [ObservableProperty]
     private string _testOutput = string.Empty;
 
     [ObservableProperty]
-    private string _presetsSummary = string.Empty;
+    private bool _isBusy;
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
 
-    public IReadOnlyList<string> RoutingModes { get; } = ["Off", "Global", "Pac"];
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveAndApplyCommand))]
+    private bool _hasUnsavedChanges;
 
-    public RoutingViewModel(ISettingsStore settingsStore, IConnectionOrchestrator orchestrator, IPacManager pacManager)
+    public Visibility ManagedVisibility => IsRemotePac ? Visibility.Collapsed : Visibility.Visible;
+    public Visibility RemoteVisibility => IsRemotePac ? Visibility.Visible : Visibility.Collapsed;
+
+    public RoutingViewModel(
+        ISettingsStore settingsStore,
+        IConnectionOrchestrator orchestrator,
+        IPacManager pacManager)
     {
         _settingsStore = settingsStore;
         _orchestrator = orchestrator;
@@ -47,69 +84,289 @@ public partial class RoutingViewModel : ObservableObject
 
     public async Task LoadAsync()
     {
-        var settings = await _settingsStore.LoadAsync();
+        IsBusy = true;
+        _suppressHandlers = true;
+        try
+        {
+            var settings = await _settingsStore.LoadAsync();
+            PacProfiles = new ObservableCollection<PacProfile>(settings.PacProfiles);
+            SelectedPacProfile = settings.GetActivePacProfile() ?? PacProfiles.FirstOrDefault();
 
-        SelectedRoutingMode = settings.RoutingMode.ToString();
-        PacProfiles = new ObservableCollection<PacProfile>(settings.PacProfiles);
-        SelectedPacProfile = settings.GetActivePacProfile() ?? PacProfiles.FirstOrDefault();
-        PacPreview = _pacManager.GetPacPreview();
+            if (SelectedPacProfile is not null)
+            {
+                LoadProfileData(SelectedPacProfile);
+            }
+
+            PacPreview = _pacManager.GetPacPreview();
+            HasUnsavedChanges = false;
+        }
+        finally
+        {
+            _suppressHandlers = false;
+            IsBusy = false;
+        }
     }
 
-    [RelayCommand]
-    private async Task ApplyAsync()
+    partial void OnSelectedPacProfileChanged(PacProfile? value)
     {
-        if (!Enum.TryParse<RoutingMode>(SelectedRoutingMode, ignoreCase: true, out var routingMode))
+        if (_suppressHandlers || value is null)
         {
-            StatusMessage = "Invalid routing mode value.";
             return;
         }
 
-        await _settingsStore.UpdateAsync(settings => settings with
-        {
-            RoutingMode = routingMode,
-            ActivePacProfileId = SelectedPacProfile?.Id,
-        });
+        _suppressHandlers = true;
+        LoadProfileData(value);
+        HasUnsavedChanges = false;
+        _suppressHandlers = false;
+    }
 
-        var result = await _orchestrator.ApplyRoutingAsync();
-        StatusMessage = result.Message;
+    partial void OnIsRemotePacChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ManagedVisibility));
+        OnPropertyChanged(nameof(RemoteVisibility));
+        MarkDirty();
+    }
+
+    partial void OnRemotePacUrlChanged(string value) => MarkDirty();
+    partial void OnDefaultActionIsProxyChanged(bool value) => MarkDirty();
+    partial void OnBypassPrivateAddressesChanged(bool value) => MarkDirty();
+    partial void OnBypassSimpleHostnamesChanged(bool value) => MarkDirty();
+    partial void OnRulesUrlChanged(string value) => MarkDirty();
+
+    [RelayCommand]
+    private void AddProxyDomain()
+    {
+        var domain = NormalizeDomain(NewProxyDomain);
+        if (string.IsNullOrWhiteSpace(domain))
+        {
+            return;
+        }
+
+        if (ProxyDomains.Any(d => d.Equals(domain, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        var existing = DirectDomains.FirstOrDefault(d => d.Equals(domain, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null)
+        {
+            DirectDomains.Remove(existing);
+        }
+
+        ProxyDomains.Add(domain);
+        NewProxyDomain = string.Empty;
+        HasUnsavedChanges = true;
     }
 
     [RelayCommand]
-    private async Task UpdatePacAsync()
+    private void RemoveProxyDomain(string domain)
+    {
+        ProxyDomains.Remove(domain);
+        HasUnsavedChanges = true;
+    }
+
+    [RelayCommand]
+    private void AddDirectDomain()
+    {
+        var domain = NormalizeDomain(NewDirectDomain);
+        if (string.IsNullOrWhiteSpace(domain))
+        {
+            return;
+        }
+
+        if (DirectDomains.Any(d => d.Equals(domain, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        var existing = ProxyDomains.FirstOrDefault(d => d.Equals(domain, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null)
+        {
+            ProxyDomains.Remove(existing);
+        }
+
+        DirectDomains.Add(domain);
+        NewDirectDomain = string.Empty;
+        HasUnsavedChanges = true;
+    }
+
+    [RelayCommand]
+    private void RemoveDirectDomain(string domain)
+    {
+        DirectDomains.Remove(domain);
+        HasUnsavedChanges = true;
+    }
+
+    private bool CanSaveAndApply() => HasUnsavedChanges;
+
+    [RelayCommand(CanExecute = nameof(CanSaveAndApply))]
+    private async Task SaveAndApplyAsync()
     {
         if (SelectedPacProfile is null)
         {
-            StatusMessage = "Select PAC profile first.";
+            return;
+        }
+
+        IsBusy = true;
+        try
+        {
+            var updatedProfile = IsRemotePac
+                ? SelectedPacProfile with
+                {
+                    Type = PacProfileType.Remote,
+                    RemotePacUrl = RemotePacUrl.Trim(),
+                }
+                : SelectedPacProfile with
+                {
+                    Type = PacProfileType.Managed,
+                    RemotePacUrl = null,
+                    InlineRules = BuildInlineRules(),
+                    DefaultAction = DefaultActionIsProxy ? PacDefaultAction.Proxy : PacDefaultAction.Direct,
+                    BypassPrivateAddresses = BypassPrivateAddresses,
+                    BypassSimpleHostnames = BypassSimpleHostnames,
+                    RulesUrl = string.IsNullOrWhiteSpace(RulesUrl) ? null : RulesUrl.Trim(),
+                };
+
+            await _settingsStore.UpdateAsync(settings =>
+            {
+                var updatedProfiles = settings.PacProfiles
+                    .Select(p => p.Id == updatedProfile.Id ? updatedProfile : p)
+                    .ToList();
+                return settings with { PacProfiles = updatedProfiles, ActivePacProfileId = updatedProfile.Id };
+            });
+
+            var currentSettings = await _settingsStore.LoadAsync();
+            if (currentSettings.RoutingMode == RoutingMode.Pac)
+            {
+                if (!IsRemotePac)
+                {
+                    await _pacManager.UpdateManagedPacAsync(updatedProfile, currentSettings.Ports.SocksPort);
+                }
+
+                await _orchestrator.ApplyRoutingAsync();
+            }
+
+            PacPreview = IsRemotePac ? $"Remote: {RemotePacUrl}" : _pacManager.GetPacPreview();
+
+            _suppressHandlers = true;
+            SelectedPacProfile = updatedProfile;
+            _suppressHandlers = false;
+
+            HasUnsavedChanges = false;
+            StatusMessage = IsRemotePac
+                ? "Remote PAC URL saved and applied."
+                : "Rules saved and applied.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task TestAsync()
+    {
+        if (SelectedPacProfile is null)
+        {
+            TestOutput = "No profile selected.";
+            return;
+        }
+
+        if (IsRemotePac)
+        {
+            TestOutput = "Testing is not available for remote PAC scripts.";
             return;
         }
 
         var settings = await _settingsStore.LoadAsync();
-        var socksPort = settings.Ports.SocksPort;
-
-        var updateResult = await _pacManager.UpdateManagedPacAsync(SelectedPacProfile, socksPort);
-        PacPreview = _pacManager.GetPacPreview();
-        StatusMessage = updateResult.Message;
+        var result = _pacManager.TestRule(SelectedPacProfile, TestInput, settings.Ports.SocksPort);
+        TestOutput = $"{result.Decision} ({result.Reason})";
     }
 
-    [RelayCommand]
-    private void Test()
+    private void LoadProfileData(PacProfile profile)
     {
-        if (SelectedPacProfile is null)
+        IsRemotePac = profile.Type == PacProfileType.Remote;
+        RemotePacUrl = profile.RemotePacUrl ?? string.Empty;
+
+        ProxyDomains.Clear();
+        DirectDomains.Clear();
+
+        foreach (var line in (profile.InlineRules ?? string.Empty)
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
-            TestOutput = "No PAC profile selected.";
-            return;
+            if (line.StartsWith('#') || line.StartsWith('!') || line.StartsWith("//"))
+            {
+                continue;
+            }
+
+            if (line.StartsWith("@@||"))
+            {
+                var domain = line[4..].TrimEnd('/').Trim();
+                if (!string.IsNullOrWhiteSpace(domain))
+                {
+                    DirectDomains.Add(domain);
+                }
+            }
+            else if (line.StartsWith("||"))
+            {
+                var domain = line[2..].TrimEnd('/').Trim();
+                if (!string.IsNullOrWhiteSpace(domain))
+                {
+                    ProxyDomains.Add(domain);
+                }
+            }
         }
 
-        var result = _pacManager.TestRule(SelectedPacProfile, TestInput, 1080);
-        TestOutput = $"Decision: {result.Decision}; Reason: {result.Reason}";
+        DefaultActionIsProxy = profile.DefaultAction == PacDefaultAction.Proxy;
+        BypassPrivateAddresses = profile.BypassPrivateAddresses;
+        BypassSimpleHostnames = profile.BypassSimpleHostnames;
+        RulesUrl = profile.RulesUrl ?? string.Empty;
     }
 
-    [RelayCommand]
-    private async Task RefreshPresetsAsync()
+    private string BuildInlineRules()
     {
-        var presets = await _pacManager.GetPresetsAsync();
-        PresetsSummary = presets.Count == 0
-            ? "No presets available."
-            : string.Join(Environment.NewLine, presets.Select(preset => $"{preset.Name}: {preset.SourceUrl}"));
+        var lines = new List<string>(ProxyDomains.Count + DirectDomains.Count);
+        foreach (var domain in ProxyDomains)
+        {
+            lines.Add($"||{domain}");
+        }
+
+        foreach (var domain in DirectDomains)
+        {
+            lines.Add($"@@||{domain}");
+        }
+
+        return string.Join('\n', lines);
+    }
+
+    private void MarkDirty()
+    {
+        if (!_suppressHandlers)
+        {
+            HasUnsavedChanges = true;
+        }
+    }
+
+    private static string NormalizeDomain(string input)
+    {
+        var domain = input.Trim().ToLowerInvariant();
+
+        if (Uri.TryCreate(domain, UriKind.Absolute, out var uri))
+        {
+            domain = uri.Host;
+        }
+
+        domain = domain.TrimStart('.').TrimEnd('/');
+
+        if (domain.StartsWith("www."))
+        {
+            domain = domain[4..];
+        }
+
+        return domain;
     }
 }

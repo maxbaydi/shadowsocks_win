@@ -1,4 +1,4 @@
-﻿using VibeShadowsocks.Core.Models;
+using VibeShadowsocks.Core.Models;
 using VibeShadowsocks.Core.Orchestration;
 
 namespace VibeShadowsocks.Platform.Tray;
@@ -15,7 +15,7 @@ public interface ITrayManager : IDisposable
 
     event EventHandler<RoutingMode>? RoutingModeChanged;
 
-    void Initialize(string appName);
+    void Initialize(string appName, string? iconPath = null);
 
     void UpdateState(ConnectionState state, RoutingMode routingMode);
 
