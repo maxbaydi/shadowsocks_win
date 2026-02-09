@@ -1,0 +1,132 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      - name: Extract version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $ver = $tag -replace '^v', ''
+          echo "VERSION=$ver" >> $env:GITHUB_OUTPUT
+          echo "TAG=$tag" >> $env:GITHUB_OUTPUT
+          Write-Host "Version: $ver"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Run tests
+        run: dotnet test -c Release --no-restore
+
+      - name: Publish application
+        run: |
+          dotnet publish src\VibeShadowsocks.App\VibeShadowsocks.App.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained `
+            -p:WindowsAppSDKSelfContained=true `
+            -p:Platform=x64 `
+            -p:Version=${{ steps.version.outputs.VERSION }} `
+            -o dist\publish
+
+      - name: Prepare distribution
+        shell: pwsh
+        run: |
+          $OutputDir = "dist\VibeShadowsocks"
+          Copy-Item "dist\publish" $OutputDir -Recurse
+
+          Get-ChildItem $OutputDir -Filter '*.pdb' -Recurse | Remove-Item -Force
+
+          $keep = @('en-us', 'en-US', 'ru', 'ru-RU')
+          Get-ChildItem $OutputDir -Directory | Where-Object {
+              $_.Name -match '^[a-z]{2}(-[A-Za-z]{2,})?$' -or
+              $_.Name -match '^[a-z]{2}-[A-Z][a-z]+-[A-Z]{2}$'
+          } | Where-Object { $keep -notcontains $_.Name } | Remove-Item -Recurse -Force
+
+          $ssLocalDir = Join-Path $OutputDir 'tools\sslocal'
+          New-Item $ssLocalDir -ItemType Directory -Force | Out-Null
+          @"
+          Place sslocal.exe here.
+          Download from: https://github.com/shadowsocks/shadowsocks-rust/releases
+          "@ | Set-Content (Join-Path $ssLocalDir 'README.txt')
+
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk
+
+      - name: Download previous releases (for delta)
+        shell: pwsh
+        run: |
+          New-Item "dist\releases" -ItemType Directory -Force | Out-Null
+          try {
+              vpk download github `
+                  --repoUrl https://github.com/${{ github.repository }} `
+                  --outputDir dist\releases `
+                  --token ${{ secrets.GITHUB_TOKEN }}
+              Write-Host "Previous releases downloaded for delta generation"
+          } catch {
+              Write-Host "No previous releases found — first release, skipping delta"
+          }
+
+      - name: Pack Velopack release
+        shell: pwsh
+        run: |
+          $icoPath = "dist\VibeShadowsocks\app.ico"
+          vpk pack `
+              --packId VibeShadowsocks `
+              --packVersion ${{ steps.version.outputs.VERSION }} `
+              --packDir dist\VibeShadowsocks `
+              --mainExe VibeShadowsocks.App.exe `
+              --icon $icoPath `
+              --packTitle "VibeShadowsocks" `
+              --outputDir dist\releases
+
+      - name: Create portable ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive `
+              -Path "dist\VibeShadowsocks\*" `
+              -DestinationPath "dist\releases\VibeShadowsocks-portable-win-x64.zip" `
+              -CompressionLevel Optimal
+
+      - name: Upload to GitHub Releases
+        shell: pwsh
+        run: |
+          vpk upload github `
+              --repoUrl https://github.com/${{ github.repository }} `
+              --publish `
+              --releaseName "VibeShadowsocks ${{ steps.version.outputs.TAG }}" `
+              --tag ${{ steps.version.outputs.TAG }} `
+              --token ${{ secrets.GITHUB_TOKEN }} `
+              --outputDir dist\releases
+
+      - name: Attach portable ZIP to release
+        shell: pwsh
+        run: |
+          gh release upload ${{ steps.version.outputs.TAG }} `
+              "dist\releases\VibeShadowsocks-portable-win-x64.zip" `
+              --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

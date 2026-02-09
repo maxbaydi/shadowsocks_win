@@ -9,7 +9,7 @@ namespace VibeShadowsocks.Infrastructure.Updates;
 
 public sealed class UpdateService : IUpdateService
 {
-    private const string GitHubRepoUrl = "https://github.com/pocketgodru/VibeShadowsocks";
+    private const string GitHubRepoUrl = "https://github.com/maxbaydi/shadowsocks_win";
     private const int TimeoutSeconds = 30;
 
     private readonly ILogger<UpdateService> _logger;
