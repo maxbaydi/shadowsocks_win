@@ -170,6 +170,9 @@
   <data name="UpdateDownloadFailed" xml:space="preserve"><value>Не удалось загрузить обновление.</value></data>
   <data name="NotifUpdateAvailableFmt" xml:space="preserve"><value>Доступно обновление: v{0}. Откройте Настройки для установки.</value></data>
 
+  <data name="MsgDownloadingSslocal" xml:space="preserve"><value>Загрузка sslocal.exe...</value></data>
+  <data name="MsgSslocalDownloadFailed" xml:space="preserve"><value>Не удалось скачать sslocal.exe. Проверьте подключение к интернету.</value></data>
+
   <data name="TooltipCopyDiag" xml:space="preserve"><value>Скопировать диагностику в буфер обмена</value></data>
   <data name="TooltipRefreshStatus" xml:space="preserve"><value>Обновить статус</value></data>
   <data name="TooltipActiveServer" xml:space="preserve"><value>Активный сервер</value></data>

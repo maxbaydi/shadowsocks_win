@@ -39,6 +39,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISettingsStore, SettingsStore>();
         services.AddSingleton<ISecureStorage, SecureStorage>();
         services.AddSingleton<ISsLocalRunner, SsLocalRunner>();
+        services.AddSingleton<ISsLocalProvisioner, SsLocalProvisioner>();
         services.AddSingleton<ISystemProxyManager, SystemProxyManager>();
 
         services.AddSingleton<LocalPacHttpServer>();

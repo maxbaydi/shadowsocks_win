@@ -170,6 +170,9 @@
   <data name="UpdateDownloadFailed" xml:space="preserve"><value>Failed to download update.</value></data>
   <data name="NotifUpdateAvailableFmt" xml:space="preserve"><value>Update available: v{0}. Open Settings to install.</value></data>
 
+  <data name="MsgDownloadingSslocal" xml:space="preserve"><value>Downloading sslocal.exe...</value></data>
+  <data name="MsgSslocalDownloadFailed" xml:space="preserve"><value>Failed to download sslocal.exe. Check your internet connection.</value></data>
+
   <data name="TooltipCopyDiag" xml:space="preserve"><value>Copy diagnostics to clipboard</value></data>
   <data name="TooltipRefreshStatus" xml:space="preserve"><value>Refresh status</value></data>
   <data name="TooltipActiveServer" xml:space="preserve"><value>Active server</value></data>

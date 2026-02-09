@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 using VibeShadowsocks.Core.Abstractions;
 using VibeShadowsocks.Core.Models;
@@ -29,7 +29,8 @@ public sealed class ConnectionOrchestratorTests
             runner,
             proxyManager,
             pacManager,
-            new FakePortProbe());
+            new FakePortProbe(),
+            new FakeSsLocalProvisioner());
 
         var connect = await orchestrator.ConnectAsync();
 
@@ -69,7 +70,8 @@ public sealed class ConnectionOrchestratorTests
             runner,
             proxyManager,
             pacManager,
-            new FakePortProbe());
+            new FakePortProbe(),
+            new FakeSsLocalProvisioner());
 
         await orchestrator.ConnectAsync();
 
@@ -264,6 +266,12 @@ public sealed class ConnectionOrchestratorTests
 
         public Task<int> FindAvailablePortAsync(int preferredPort, CancellationToken cancellationToken = default)
             => Task.FromResult(preferredPort + 1);
+    }
+
+    private sealed class FakeSsLocalProvisioner : ISsLocalProvisioner
+    {
+        public Task<string> EnsureAvailableAsync(string? configuredPath, CancellationToken ct = default)
+            => Task.FromResult(configuredPath ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "cmd.exe"));
     }
 }
 

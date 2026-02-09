@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Threading.Channels;
 using Microsoft.Extensions.Logging;
 using VibeShadowsocks.Core.Abstractions;
@@ -21,6 +21,7 @@ public sealed class ConnectionOrchestrator : IConnectionOrchestrator, IDisposabl
     private readonly ISystemProxyManager _proxyManager;
     private readonly IPacManager _pacManager;
     private readonly IPortAvailabilityProbe _portProbe;
+    private readonly ISsLocalProvisioner _ssLocalProvisioner;
     private readonly ConnectionOrchestratorOptions _options;
 
     private readonly Channel<QueueItem> _commands = Channel.CreateUnbounded<QueueItem>(
@@ -32,7 +33,7 @@ public sealed class ConnectionOrchestrator : IConnectionOrchestrator, IDisposabl
     private readonly Task _processingLoop;
 
     private volatile ConnectionStatusSnapshot _snapshot =
-        new(ConnectionState.Disconnected, "Idle", DateTimeOffset.UtcNow, null, null, null);
+        new(ConnectionState.Disconnected, string.Empty, DateTimeOffset.UtcNow, null, null, null);
 
     private string? _connectedServerProfileId;
     private string? _connectedPacProfileId;
@@ -48,6 +49,7 @@ public sealed class ConnectionOrchestrator : IConnectionOrchestrator, IDisposabl
         ISystemProxyManager proxyManager,
         IPacManager pacManager,
         IPortAvailabilityProbe portProbe,
+        ISsLocalProvisioner ssLocalProvisioner,
         ConnectionOrchestratorOptions? options = null)
     {
         _logger = logger;
@@ -58,6 +60,7 @@ public sealed class ConnectionOrchestrator : IConnectionOrchestrator, IDisposabl
         _proxyManager = proxyManager;
         _pacManager = pacManager;
         _portProbe = portProbe;
+        _ssLocalProvisioner = ssLocalProvisioner;
         _options = options ?? new ConnectionOrchestratorOptions();
 
         _ssLocalRunner.UnexpectedExit += OnUnexpectedExit;
@@ -261,9 +264,13 @@ public sealed class ConnectionOrchestrator : IConnectionOrchestrator, IDisposabl
             using var startTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             startTimeout.CancelAfter(_options.StartTimeout);
 
+            var executablePath = await _ssLocalProvisioner
+                .EnsureAvailableAsync(settings.SsLocalExecutablePath, cancellationToken)
+                .ConfigureAwait(false);
+
             var startResult = await _ssLocalRunner.StartAsync(
                 new SsLocalStartRequest(
-                    ResolveExecutablePath(settings),
+                    executablePath,
                     activeProfile,
                     password,
                     socksPort,
@@ -514,21 +521,6 @@ public sealed class ConnectionOrchestrator : IConnectionOrchestrator, IDisposabl
         return alternative;
     }
 
-    private static string ResolveExecutablePath(AppSettings settings)
-    {
-        if (!string.IsNullOrWhiteSpace(settings.SsLocalExecutablePath))
-        {
-            return settings.SsLocalExecutablePath;
-        }
-
-        var candidate = Path.Combine(AppContext.BaseDirectory, "tools", "sslocal", "sslocal.exe");
-        if (File.Exists(candidate))
-        {
-            return candidate;
-        }
-
-        throw new FileNotFoundException("sslocal.exe path is not configured and default location was not found.", candidate);
-    }
 
     private void OnUnexpectedExit(object? sender, SsLocalExitedEventArgs eventArgs)
     {
