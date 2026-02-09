@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using VibeShadowsocks.App.Helpers;
-using VibeShadowsocks.App.Services;
 using VibeShadowsocks.App.ViewModels;
 using VibeShadowsocks.Core.Abstractions;
 using VibeShadowsocks.Core.Extensions;
@@ -147,8 +146,6 @@ public partial class App : Application
                 services.AddVibeShadowsocksCore();
                 services.AddVibeShadowsocksInfrastructure();
                 services.AddVibeShadowsocksPlatform();
-
-                services.AddSingleton<IClipboardService, ClipboardService>();
 
                 services.AddSingleton<MainViewModel>();
                 services.AddTransient<DashboardViewModel>();

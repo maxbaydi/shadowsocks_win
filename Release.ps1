@@ -97,7 +97,7 @@ Push-Location $RepoRoot
 try {
     git add Directory.Build.props
     git add -A
-    git commit -m "release: v$newVersion"
+    git commit -m "Release: v$newVersion"
     if ($LASTEXITCODE -ne 0) { throw "Git commit failed" }
     Write-Ok "Committed"
 } finally {

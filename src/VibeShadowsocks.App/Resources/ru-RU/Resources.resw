@@ -104,6 +104,15 @@
   <data name="RefreshBtnText.Text" xml:space="preserve"><value>Обновить</value></data>
   <data name="ExportDiagBtnText.Text" xml:space="preserve"><value>Экспорт диагностики</value></data>
 
+  <data name="StateDisconnected" xml:space="preserve"><value>Отключено</value></data>
+  <data name="StateStarting" xml:space="preserve"><value>Подключение</value></data>
+  <data name="StateConnected" xml:space="preserve"><value>Подключено</value></data>
+  <data name="StateStopping" xml:space="preserve"><value>Отключение</value></data>
+  <data name="StateFaulted" xml:space="preserve"><value>Ошибка</value></data>
+  <data name="MsgStarting" xml:space="preserve"><value>Установка соединения...</value></data>
+  <data name="MsgConnected" xml:space="preserve"><value>Туннель активен</value></data>
+  <data name="MsgStopping" xml:space="preserve"><value>Закрытие соединения...</value></data>
+
   <data name="SettingsLoaded" xml:space="preserve"><value>Настройки загружены.</value></data>
   <data name="SettingsSaved" xml:space="preserve"><value>Настройки сохранены.</value></data>
   <data name="HotkeyConflictFmt" xml:space="preserve"><value>Конфликт горячей клавиши: {0}</value></data>

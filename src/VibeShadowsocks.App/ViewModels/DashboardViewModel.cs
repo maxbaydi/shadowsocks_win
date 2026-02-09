@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using VibeShadowsocks.App.Helpers;
-using VibeShadowsocks.App.Services;
 using VibeShadowsocks.Core.Abstractions;
 using VibeShadowsocks.Core.Models;
 using VibeShadowsocks.Core.Orchestration;
@@ -14,8 +13,6 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
 {
     private readonly IConnectionOrchestrator _orchestrator;
     private readonly ISettingsStore _settingsStore;
-    private readonly IDiagnosticsService _diagnosticsService;
-    private readonly IClipboardService _clipboardService;
     private readonly DispatcherQueue? _dispatcherQueue;
 
     private bool _suppressSelectionHandlers;
@@ -53,27 +50,18 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private bool _isErrorVisible;
 
-    [ObservableProperty]
-    private string _copyButtonText = string.Empty;
-
-    public string TooltipCopyDiag => Loc.Get("TooltipCopyDiag");
     public string TooltipRefreshStatus => Loc.Get("TooltipRefreshStatus");
 
     public IReadOnlyList<string> RoutingModes { get; } = ["Off", "Global", "Pac"];
 
     public DashboardViewModel(
         IConnectionOrchestrator orchestrator,
-        ISettingsStore settingsStore,
-        IDiagnosticsService diagnosticsService,
-        IClipboardService clipboardService)
+        ISettingsStore settingsStore)
     {
         _orchestrator = orchestrator;
         _settingsStore = settingsStore;
-        _diagnosticsService = diagnosticsService;
-        _clipboardService = clipboardService;
         _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         _stateMessage = Loc.Get("ReadyToConnect");
-        _copyButtonText = Loc.Get("CopyDiagnostics");
 
         _orchestrator.StateChanged += OnStateChanged;
     }
@@ -188,16 +176,6 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private async Task CopyDiagnosticsAsync()
-    {
-        var diagnostics = await _diagnosticsService.BuildTextReportAsync();
-        _clipboardService.SetText(diagnostics);
-        CopyButtonText = Loc.Get("Copied");
-        await Task.Delay(1500);
-        CopyButtonText = Loc.Get("CopyDiagnostics");
-    }
-
-    [RelayCommand]
     private async Task RefreshAsync()
     {
         _suppressSelectionHandlers = true;
@@ -207,8 +185,8 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
             var settings = await _settingsStore.LoadAsync();
 
             ConnectionState = snapshot.State;
-            StateText = snapshot.State.ToString();
-            StateMessage = snapshot.Message;
+            StateText = LocalizeState(snapshot.State);
+            StateMessage = LocalizeMessage(snapshot.State, snapshot.Message);
 
             ServerProfiles = new ObservableCollection<ServerProfile>(settings.ServerProfiles);
             SelectedServer = settings.GetActiveServerProfile();
@@ -235,8 +213,8 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
         void Update()
         {
             ConnectionState = args.Snapshot.State;
-            StateText = args.Snapshot.State.ToString();
-            StateMessage = args.Snapshot.Message;
+            StateText = LocalizeState(args.Snapshot.State);
+            StateMessage = LocalizeMessage(args.Snapshot.State, args.Snapshot.Message);
             IsErrorVisible = args.Snapshot.State == ConnectionState.Faulted;
             UpdateCommandStates(args.Snapshot.State);
         }
@@ -257,4 +235,23 @@ public partial class DashboardViewModel : ObservableObject, IDisposable
         CanConnect = state is ConnectionState.Disconnected or ConnectionState.Faulted;
         CanDisconnect = state is ConnectionState.Connected;
     }
+
+    private static string LocalizeState(ConnectionState state) => state switch
+    {
+        ConnectionState.Disconnected => Loc.Get("StateDisconnected"),
+        ConnectionState.Starting => Loc.Get("StateStarting"),
+        ConnectionState.Connected => Loc.Get("StateConnected"),
+        ConnectionState.Stopping => Loc.Get("StateStopping"),
+        ConnectionState.Faulted => Loc.Get("StateFaulted"),
+        _ => state.ToString(),
+    };
+
+    private static string LocalizeMessage(ConnectionState state, string rawMessage) => state switch
+    {
+        ConnectionState.Disconnected when string.IsNullOrEmpty(rawMessage) => Loc.Get("ReadyToConnect"),
+        ConnectionState.Starting => Loc.Get("MsgStarting"),
+        ConnectionState.Connected when string.IsNullOrEmpty(rawMessage) => Loc.Get("MsgConnected"),
+        ConnectionState.Stopping => Loc.Get("MsgStopping"),
+        _ => rawMessage,
+    };
 }

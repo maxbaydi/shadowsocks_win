@@ -104,6 +104,15 @@
   <data name="RefreshBtnText.Text" xml:space="preserve"><value>Refresh</value></data>
   <data name="ExportDiagBtnText.Text" xml:space="preserve"><value>Export Diagnostics</value></data>
 
+  <data name="StateDisconnected" xml:space="preserve"><value>Disconnected</value></data>
+  <data name="StateStarting" xml:space="preserve"><value>Starting</value></data>
+  <data name="StateConnected" xml:space="preserve"><value>Connected</value></data>
+  <data name="StateStopping" xml:space="preserve"><value>Stopping</value></data>
+  <data name="StateFaulted" xml:space="preserve"><value>Error</value></data>
+  <data name="MsgStarting" xml:space="preserve"><value>Establishing connection...</value></data>
+  <data name="MsgConnected" xml:space="preserve"><value>Tunnel active</value></data>
+  <data name="MsgStopping" xml:space="preserve"><value>Closing connection...</value></data>
+
   <data name="SettingsLoaded" xml:space="preserve"><value>Settings loaded.</value></data>
   <data name="SettingsSaved" xml:space="preserve"><value>Settings saved.</value></data>
   <data name="HotkeyConflictFmt" xml:space="preserve"><value>Hotkey conflict: {0}</value></data>
