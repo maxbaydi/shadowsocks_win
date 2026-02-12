@@ -38,6 +38,7 @@ public sealed class ConnectionOrchestrator : IConnectionOrchestrator, IDisposabl
     private string? _connectedServerProfileId;
     private string? _connectedPacProfileId;
     private int _connectedSocksPort;
+    private int _connectedHttpPort;
     private int _connectedPacPort;
 
     public ConnectionOrchestrator(
@@ -253,7 +254,11 @@ public sealed class ConnectionOrchestrator : IConnectionOrchestrator, IDisposabl
             }
 
             var socksPort = await ResolvePortAsync(settings.Ports.SocksPort, settings.Ports.AutoSelectOnConflict, cancellationToken).ConfigureAwait(false);
+            var httpPort = settings.Ports.HttpPort > 0
+                ? await ResolvePortAsync(settings.Ports.HttpPort, settings.Ports.AutoSelectOnConflict, cancellationToken).ConfigureAwait(false)
+                : 0;
             var pacPort = await ResolvePortAsync(settings.Ports.PacServerPort, settings.Ports.AutoSelectOnConflict, cancellationToken).ConfigureAwait(false);
+            var listenAddress = settings.Ports.ListenAddress;
 
             var runtimePath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -274,6 +279,8 @@ public sealed class ConnectionOrchestrator : IConnectionOrchestrator, IDisposabl
                     activeProfile,
                     password,
                     socksPort,
+                    httpPort,
+                    listenAddress,
                     runtimePath,
                     UseServerUrlMode: false),
                 startTimeout.Token).ConfigureAwait(false);
@@ -299,11 +306,12 @@ public sealed class ConnectionOrchestrator : IConnectionOrchestrator, IDisposabl
                     _connectedPacProfileId = pacProfile.Id;
                 }
 
-                await _proxyManager.ApplyRoutingModeAsync(settings.RoutingMode, socksPort, pacUri, startTimeout.Token).ConfigureAwait(false);
+                await _proxyManager.ApplyRoutingModeAsync(settings.RoutingMode, socksPort, httpPort, pacUri, startTimeout.Token).ConfigureAwait(false);
             }
 
             _connectedServerProfileId = activeProfile.Id;
             _connectedSocksPort = socksPort;
+            _connectedHttpPort = httpPort;
             _connectedPacPort = pacPort;
 
             SetState(ConnectionState.Connected, "Connected", activeProfile.Id, _connectedPacProfileId, startResult.ProcessId);
@@ -368,6 +376,7 @@ public sealed class ConnectionOrchestrator : IConnectionOrchestrator, IDisposabl
         _connectedServerProfileId = null;
         _connectedPacProfileId = null;
         _connectedSocksPort = 0;
+        _connectedHttpPort = 0;
         _connectedPacPort = 0;
 
         if (errors.Count > 0)
@@ -412,7 +421,7 @@ public sealed class ConnectionOrchestrator : IConnectionOrchestrator, IDisposabl
             await _proxyManager.BeginSessionAsync(proxyTimeout.Token).ConfigureAwait(false);
         }
 
-        await _proxyManager.ApplyRoutingModeAsync(settings.RoutingMode, _connectedSocksPort, pacUri, proxyTimeout.Token).ConfigureAwait(false);
+        await _proxyManager.ApplyRoutingModeAsync(settings.RoutingMode, _connectedSocksPort, _connectedHttpPort, pacUri, proxyTimeout.Token).ConfigureAwait(false);
         SetState(ConnectionState.Connected, $"Routing mode applied: {settings.RoutingMode}", _connectedServerProfileId, _connectedPacProfileId, _ssLocalRunner.ProcessId);
         return OrchestrationResult.Ok("Routing mode applied.");
     }

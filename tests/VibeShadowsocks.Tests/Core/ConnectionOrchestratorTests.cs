@@ -217,7 +217,7 @@ public sealed class ConnectionOrchestratorTests
             return Task.CompletedTask;
         }
 
-        public Task ApplyRoutingModeAsync(RoutingMode routingMode, int socksPort, Uri? pacUri, CancellationToken cancellationToken = default)
+        public Task ApplyRoutingModeAsync(RoutingMode routingMode, int socksPort, int httpPort, Uri? pacUri, CancellationToken cancellationToken = default)
         {
             ApplyCount++;
             return Task.CompletedTask;

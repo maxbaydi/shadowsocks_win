@@ -1,4 +1,4 @@
-﻿using VibeShadowsocks.Core.Models;
+using VibeShadowsocks.Core.Models;
 
 namespace VibeShadowsocks.Core.Abstractions;
 
@@ -22,6 +22,8 @@ public sealed record SsLocalStartRequest(
     ServerProfile Profile,
     string Password,
     int SocksPort,
+    int HttpPort,
+    string ListenAddress,
     string ConfigDirectory,
     bool UseServerUrlMode);
 

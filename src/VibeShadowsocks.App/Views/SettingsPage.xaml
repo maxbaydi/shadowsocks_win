@@ -105,14 +105,18 @@
                 Padding="20">
                 <StackPanel Spacing="12">
                     <TextBlock x:Uid="NetworkSection" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                    <TextBox x:Uid="ListenAddressBox" Text="{Binding ListenAddress, Mode=TwoWay}" MaxWidth="260" HorizontalAlignment="Left" />
                     <Grid ColumnSpacing="16">
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <NumberBox x:Uid="SocksPortBox" Value="{Binding SocksPort, Mode=TwoWay}"
                                    Minimum="1" Maximum="65535" SpinButtonPlacementMode="Compact" />
-                        <NumberBox x:Uid="PacPortBox" Grid.Column="1" Value="{Binding PacPort, Mode=TwoWay}"
+                        <NumberBox x:Uid="HttpPortBox" Grid.Column="1" Value="{Binding HttpPort, Mode=TwoWay}"
+                                   Minimum="0" Maximum="65535" SpinButtonPlacementMode="Compact" />
+                        <NumberBox x:Uid="PacPortBox" Grid.Column="2" Value="{Binding PacPort, Mode=TwoWay}"
                                    Minimum="1" Maximum="65535" SpinButtonPlacementMode="Compact" />
                     </Grid>
                 </StackPanel>

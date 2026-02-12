@@ -1,4 +1,4 @@
-﻿using VibeShadowsocks.Core.Models;
+using VibeShadowsocks.Core.Models;
 
 namespace VibeShadowsocks.Core.Abstractions;
 
@@ -8,7 +8,7 @@ public interface ISystemProxyManager
 
     Task BeginSessionAsync(CancellationToken cancellationToken = default);
 
-    Task ApplyRoutingModeAsync(RoutingMode routingMode, int socksPort, Uri? pacUri, CancellationToken cancellationToken = default);
+    Task ApplyRoutingModeAsync(RoutingMode routingMode, int socksPort, int httpPort, Uri? pacUri, CancellationToken cancellationToken = default);
 
     Task RollbackAsync(CancellationToken cancellationToken = default);
 }

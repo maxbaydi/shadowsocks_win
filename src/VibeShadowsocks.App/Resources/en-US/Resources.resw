@@ -32,7 +32,10 @@
   <data name="SsLocalPathBox.PlaceholderText" xml:space="preserve"><value>Leave empty for default (tools/sslocal/sslocal.exe)</value></data>
   <data name="BrowseBtn.Content" xml:space="preserve"><value>Browse...</value></data>
   <data name="NetworkSection.Text" xml:space="preserve"><value>Network</value></data>
+  <data name="ListenAddressBox.Header" xml:space="preserve"><value>Listen address</value></data>
+  <data name="ListenAddressBox.PlaceholderText" xml:space="preserve"><value>127.0.0.1 or 0.0.0.0 for all interfaces</value></data>
   <data name="SocksPortBox.Header" xml:space="preserve"><value>SOCKS port</value></data>
+  <data name="HttpPortBox.Header" xml:space="preserve"><value>HTTP port (0 = off)</value></data>
   <data name="PacPortBox.Header" xml:space="preserve"><value>PAC server port</value></data>
   <data name="HotkeySection.Text" xml:space="preserve"><value>Hotkey</value></data>
   <data name="HotkeyBox.Header" xml:space="preserve"><value>Global hotkey (toggle connect/disconnect)</value></data>

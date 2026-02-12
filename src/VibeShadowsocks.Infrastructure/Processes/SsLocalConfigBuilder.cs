@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using VibeShadowsocks.Core.Models;
 
 namespace VibeShadowsocks.Infrastructure.Processes;
@@ -11,34 +12,46 @@ public static class SsLocalConfigBuilder
         WriteIndented = true,
     };
 
-    public static string BuildConfigJson(ServerProfile profile, string password, int socksPort)
+    public static string BuildConfigJson(ServerProfile profile, string password, int socksPort, int httpPort, string listenAddress)
     {
-        var config = new
+        var locals = new JsonArray
         {
-            servers = new[]
+            new JsonObject
             {
-                new
-                {
-                    address = profile.Host,
-                    port = profile.Port,
-                    method = profile.Method,
-                    password,
-                    plugin = profile.Plugin,
-                    plugin_opts = profile.PluginOptions,
-                },
-            },
-            locals = new[]
-            {
-                new
-                {
-                    local_address = "127.0.0.1",
-                    local_port = socksPort,
-                    protocol = "socks",
-                },
+                ["local_address"] = listenAddress,
+                ["local_port"] = socksPort,
+                ["protocol"] = "socks",
             },
         };
 
-        return JsonSerializer.Serialize(config, SerializerOptions);
+        if (httpPort > 0)
+        {
+            locals.Add(new JsonObject
+            {
+                ["local_address"] = listenAddress,
+                ["local_port"] = httpPort,
+                ["protocol"] = "http",
+            });
+        }
+
+        var config = new JsonObject
+        {
+            ["servers"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["address"] = profile.Host,
+                    ["port"] = profile.Port,
+                    ["method"] = profile.Method,
+                    ["password"] = password,
+                    ["plugin"] = profile.Plugin is not null ? JsonValue.Create(profile.Plugin) : null,
+                    ["plugin_opts"] = profile.PluginOptions is not null ? JsonValue.Create(profile.PluginOptions) : null,
+                },
+            },
+            ["locals"] = locals,
+        };
+
+        return config.ToJsonString(SerializerOptions);
     }
 
     public static string BuildServerUrl(ServerProfile profile, string password)

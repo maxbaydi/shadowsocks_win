@@ -34,7 +34,13 @@ public partial class SettingsViewModel : ObservableObject
     private int _socksPort = 1080;
 
     [ObservableProperty]
+    private int _httpPort = 1081;
+
+    [ObservableProperty]
     private int _pacPort = 8090;
+
+    [ObservableProperty]
+    private string _listenAddress = "127.0.0.1";
 
     [ObservableProperty]
     private string _hotkeyText = "Ctrl+Alt+Shift+P";
@@ -112,7 +118,9 @@ public partial class SettingsViewModel : ObservableObject
         MinimizeToTrayOnClose = settings.MinimizeToTrayOnClose;
         SsLocalPath = settings.SsLocalExecutablePath ?? string.Empty;
         SocksPort = settings.Ports.SocksPort;
+        HttpPort = settings.Ports.HttpPort;
         PacPort = settings.Ports.PacServerPort;
+        ListenAddress = settings.Ports.ListenAddress;
         HotkeyText = settings.Hotkey.Display;
         LogLevel = settings.LogLevel;
         SelectedLanguage = LanguageCodeToDisplay(settings.Language);
@@ -152,7 +160,9 @@ public partial class SettingsViewModel : ObservableObject
                 Ports = settings.Ports with
                 {
                     SocksPort = SocksPort,
+                    HttpPort = HttpPort,
                     PacServerPort = PacPort,
+                    ListenAddress = ListenAddress,
                 },
                 Hotkey = hotkey,
                 LogLevel = LogLevel,

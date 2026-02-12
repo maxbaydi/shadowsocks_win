@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using VibeShadowsocks.Core.Abstractions;
@@ -82,7 +82,7 @@ public sealed class SystemProxyManager(ILogger<SystemProxyManager> logger, AppPa
         }
     }
 
-    public async Task ApplyRoutingModeAsync(RoutingMode routingMode, int socksPort, Uri? pacUri, CancellationToken cancellationToken = default)
+    public async Task ApplyRoutingModeAsync(RoutingMode routingMode, int socksPort, int httpPort, Uri? pacUri, CancellationToken cancellationToken = default)
     {
         await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
@@ -102,8 +102,11 @@ public sealed class SystemProxyManager(ILogger<SystemProxyManager> logger, AppPa
                     key.DeleteValue("AutoConfigURL", throwOnMissingValue: false);
                     break;
                 case RoutingMode.Global:
+                    var proxyServer = httpPort > 0
+                        ? $"http=127.0.0.1:{httpPort};socks=127.0.0.1:{socksPort}"
+                        : $"socks=127.0.0.1:{socksPort}";
                     key.SetValue("ProxyEnable", 1, RegistryValueKind.DWord);
-                    key.SetValue("ProxyServer", $"socks=127.0.0.1:{socksPort}", RegistryValueKind.String);
+                    key.SetValue("ProxyServer", proxyServer, RegistryValueKind.String);
                     key.SetValue("ProxyOverride", "<local>;127.*;localhost", RegistryValueKind.String);
                     key.DeleteValue("AutoConfigURL", throwOnMissingValue: false);
                     key.SetValue("AutoDetect", 0, RegistryValueKind.DWord);

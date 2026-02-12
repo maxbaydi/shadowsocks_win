@@ -32,7 +32,10 @@
   <data name="SsLocalPathBox.PlaceholderText" xml:space="preserve"><value>Оставьте пустым для пути по умолчанию (tools/sslocal/sslocal.exe)</value></data>
   <data name="BrowseBtn.Content" xml:space="preserve"><value>Обзор...</value></data>
   <data name="NetworkSection.Text" xml:space="preserve"><value>Сеть</value></data>
+  <data name="ListenAddressBox.Header" xml:space="preserve"><value>Адрес прослушивания</value></data>
+  <data name="ListenAddressBox.PlaceholderText" xml:space="preserve"><value>127.0.0.1 или 0.0.0.0 для всех интерфейсов</value></data>
   <data name="SocksPortBox.Header" xml:space="preserve"><value>Порт SOCKS</value></data>
+  <data name="HttpPortBox.Header" xml:space="preserve"><value>Порт HTTP (0 = выкл)</value></data>
   <data name="PacPortBox.Header" xml:space="preserve"><value>Порт PAC сервера</value></data>
   <data name="HotkeySection.Text" xml:space="preserve"><value>Горячая клавиша</value></data>
   <data name="HotkeyBox.Header" xml:space="preserve"><value>Глобальная горячая клавиша (переключение подключения)</value></data>

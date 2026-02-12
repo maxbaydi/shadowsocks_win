@@ -44,11 +44,11 @@ public sealed class SsLocalRunner(ILogger<SsLocalRunner> logger) : ISsLocalRunne
             string arguments;
             if (request.UseServerUrlMode)
             {
-                arguments = $"--server-url \"{SsLocalConfigBuilder.BuildServerUrl(request.Profile, request.Password)}\" --local-addr 127.0.0.1:{request.SocksPort}";
+                arguments = $"--server-url \"{SsLocalConfigBuilder.BuildServerUrl(request.Profile, request.Password)}\" --local-addr {request.ListenAddress}:{request.SocksPort}";
             }
             else
             {
-                var configJson = SsLocalConfigBuilder.BuildConfigJson(request.Profile, request.Password, request.SocksPort);
+                var configJson = SsLocalConfigBuilder.BuildConfigJson(request.Profile, request.Password, request.SocksPort, request.HttpPort, request.ListenAddress);
                 await Storage.AtomicFileWriter.WriteTextAsync(_configPath, configJson, cancellationToken: cancellationToken).ConfigureAwait(false);
                 arguments = $"-c \"{_configPath}\"";
             }
@@ -173,7 +173,7 @@ public sealed class SsLocalRunner(ILogger<SsLocalRunner> logger) : ISsLocalRunne
             try
             {
                 using var client = new TcpClient();
-                var connectTask = client.ConnectAsync("127.0.0.1", port);
+                var connectTask = client.ConnectAsync(System.Net.IPAddress.Loopback, port);
                 var completed = await Task.WhenAny(connectTask, Task.Delay(250, cancellationToken)).ConfigureAwait(false);
                 if (completed == connectTask && client.Connected)
                 {
