@@ -61,20 +61,18 @@ foreach ($dir in $localeDirs) {
     }
 }
 
-Write-Step 'Creating tools\sslocal directory'
+Write-Step 'Verifying tools\sslocal'
 $ssLocalDir = Join-Path $OutputDir 'tools\sslocal'
+$ssLocalExe = Join-Path $ssLocalDir 'sslocal.exe'
 New-Item $ssLocalDir -ItemType Directory -Force | Out-Null
 
 if ($SsLocalPath -and (Test-Path $SsLocalPath)) {
-    Copy-Item $SsLocalPath (Join-Path $ssLocalDir 'sslocal.exe')
+    Copy-Item $SsLocalPath $ssLocalExe -Force
     Write-Host "  Copied sslocal.exe from $SsLocalPath"
+} elseif (Test-Path $ssLocalExe) {
+    Write-Host "  sslocal.exe already present (bundled via csproj)"
 } else {
-    @"
-Place sslocal.exe here.
-Download from: https://github.com/shadowsocks/shadowsocks-rust/releases
-Choose the archive for Windows x86_64, extract sslocal.exe into this folder.
-"@ | Set-Content (Join-Path $ssLocalDir 'README.txt')
-    Write-Host '  sslocal.exe not provided — README.txt created'
+    throw "sslocal.exe not found in $ssLocalDir. Ensure it exists at src\VibeShadowsocks.App\tools\sslocal\sslocal.exe"
 }
 
 $fileCount = (Get-ChildItem $OutputDir -Recurse -File).Count

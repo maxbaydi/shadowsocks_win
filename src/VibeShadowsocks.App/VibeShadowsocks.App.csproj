@@ -23,6 +23,8 @@
   <ItemGroup>
     <Content Include="app.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="logo.png" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="tools\sslocal\sslocal.exe" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="tools\sslocal\README.txt" CopyToOutputDirectory="PreserveNewest" Condition="Exists('tools\sslocal\README.txt')" />
   </ItemGroup>
 
   <Target Name="_CopyWinUiResourcesToPublish" AfterTargets="Publish">

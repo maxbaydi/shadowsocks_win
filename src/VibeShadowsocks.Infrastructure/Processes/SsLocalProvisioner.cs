@@ -13,12 +13,10 @@ public sealed class SsLocalProvisioner : ISsLocalProvisioner
 
     private static readonly SemaphoreSlim Gate = new(1, 1);
 
-    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<SsLocalProvisioner> _logger;
 
-    public SsLocalProvisioner(IHttpClientFactory httpClientFactory, ILogger<SsLocalProvisioner> logger)
+    public SsLocalProvisioner(ILogger<SsLocalProvisioner> logger)
     {
-        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
 
@@ -55,7 +53,8 @@ public sealed class SsLocalProvisioner : ISsLocalProvisioner
 
     private async Task DownloadAsync(string targetPath, CancellationToken ct)
     {
-        using var client = _httpClientFactory.CreateClient();
+        var handler = new System.Net.Http.HttpClientHandler { UseProxy = false };
+        using var client = new System.Net.Http.HttpClient(handler);
         client.Timeout = TimeSpan.FromSeconds(DownloadTimeoutSeconds);
         client.DefaultRequestHeaders.UserAgent.ParseAdd("VibeShadowsocks/1.0");
 
