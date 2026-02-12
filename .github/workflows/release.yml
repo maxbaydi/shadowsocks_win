@@ -73,12 +73,11 @@ jobs:
               $_.Name -match '^[a-z]{2}-[A-Z][a-z]+-[A-Z]{2}$'
           } | Where-Object { $keep -notcontains $_.Name } | Remove-Item -Recurse -Force
 
-          $ssLocalDir = Join-Path $OutputDir 'tools\sslocal'
-          New-Item $ssLocalDir -ItemType Directory -Force | Out-Null
-          @"
-          Place sslocal.exe here.
-          Download from: https://github.com/shadowsocks/shadowsocks-rust/releases
-          "@ | Set-Content (Join-Path $ssLocalDir 'README.txt')
+          $ssLocalExe = Join-Path $OutputDir 'tools\sslocal\sslocal.exe'
+          if (-not (Test-Path $ssLocalExe)) {
+              throw "sslocal.exe not found at $ssLocalExe — ensure it is included in the csproj"
+          }
+          Write-Host "sslocal.exe verified at $ssLocalExe"
 
       - name: Install Velopack CLI
         run: dotnet tool install -g vpk
